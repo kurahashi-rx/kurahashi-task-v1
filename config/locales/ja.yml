@@ -38,6 +38,7 @@ ja:
       index:
         title: "タスク一覧"
         new_task: "新規タスク"
+        no_tasks: "タスクがありません"
       show:
         title: "タスク詳細"
         edit: "このタスクを編集"

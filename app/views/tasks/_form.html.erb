@@ -1,9 +1,8 @@
-<%= form_with(model: task) do |form| %>
+<%= form_with(model: task, class: "space-y-6") do |form| %>
   <% if task.errors.any? %>
-    <div id="error_explanation" style="background: #fee; color: #c00; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
-      <h2><%= t("errors.template.header", count: task.errors.count, model: Task.model_name.human) %></h2>
-
-      <ul>
+    <div id="error_explanation" class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+      <h2 class="font-medium mb-2"><%= t("errors.template.header", count: task.errors.count, model: Task.model_name.human) %></h2>
+      <ul class="list-disc list-inside space-y-1">
         <% task.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -11,17 +10,17 @@
     </div>
   <% end %>
 
-  <div style="margin-bottom: 1rem;">
-    <%= form.label :title %>
-    <%= form.text_field :title %>
-  </div>
-
-  <div style="margin-bottom: 1rem;">
-    <%= form.label :content %>
-    <%= form.text_area :content, rows: 4 %>
+  <div>
+    <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <%= form.text_field :title, class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
   </div>
 
   <div>
-    <%= form.submit(task.new_record? ? t("views.tasks.form.submit_create") : t("views.tasks.form.submit_update")) %>
+    <%= form.label :content, class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <%= form.text_area :content, rows: 4, class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
+  </div>
+
+  <div>
+    <%= form.submit(task.new_record? ? t("views.tasks.form.submit_create") : t("views.tasks.form.submit_update"), class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors cursor-pointer") %>
   </div>
 <% end %>

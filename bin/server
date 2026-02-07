@@ -1,0 +1,11 @@
+#!/bin/bash -e
+set -e
+
+# データベースの準備
+bin/rails db:prepare
+
+# Tailwind CSS のビルド
+bin/rails tailwindcss:build
+
+# サーバー起動
+exec bin/rails server -b 0.0.0.0

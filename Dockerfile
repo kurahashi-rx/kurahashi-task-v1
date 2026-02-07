@@ -13,6 +13,8 @@ RUN bundle install
 # アプリケーション全ファイルのコピー
 COPY . .
 
-# サーバー起動
+# サーバー起動スクリプトを実行可能に
+RUN chmod +x bin/server
+
 EXPOSE 3000
-CMD ["rails", "server", "-b", "0.0.0.0"]
+CMD ["./bin/server"]

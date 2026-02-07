@@ -31,6 +31,9 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 # 日本語化（日付・時刻・数値フォーマットなど）
 gem "rails-i18n"
 
+# Tailwind CSS
+gem "tailwindcss-rails", "~> 3.3"
+
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 
