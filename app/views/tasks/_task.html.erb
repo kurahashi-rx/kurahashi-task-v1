@@ -1,0 +1,17 @@
+<div id="<%= dom_id task %>">
+  <p>
+    <strong>Title:</strong>
+    <%= task.title %>
+  </p>
+
+  <p>
+    <strong>Content:</strong>
+    <%= task.content %>
+  </p>
+
+  <p>
+    <%= link_to "Show this task", task %>
+    <%= link_to "Edit this task", edit_task_path(task) %>
+    <%= button_to "Destroy this task", task, method: :delete, data: { turbo_confirm: "Are you sure?" } %>
+  </p>
+</div>
