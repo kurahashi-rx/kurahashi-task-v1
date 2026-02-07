@@ -1,9 +1,9 @@
 <div style="margin-bottom: 1rem;">
-  <h1>New task</h1>
+  <h1><%= t("views.tasks.new.title") %></h1>
 </div>
 
 <%= render "form", task: @task %>
 
 <div>
-  <%= link_to "Back to tasks", tasks_path %>
+  <%= link_to t("views.tasks.new.back"), tasks_path %>
 </div>

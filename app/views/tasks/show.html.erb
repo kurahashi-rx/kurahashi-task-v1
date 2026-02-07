@@ -1,17 +1,17 @@
 <div id="<%= dom_id @task %>">
   <p>
-    <strong>Title:</strong>
+    <strong><%= Task.human_attribute_name(:title) %>:</strong>
     <%= @task.title %>
   </p>
 
   <p>
-    <strong>Content:</strong>
+    <strong><%= Task.human_attribute_name(:content) %>:</strong>
     <%= @task.content %>
   </p>
 </div>
 
 <div>
-  <%= link_to "Edit this task", edit_task_path(@task) %>
-  <%= link_to "Back to tasks", tasks_path %>
-  <%= button_to "Destroy this task", @task, method: :delete, data: { turbo_confirm: "Are you sure?" } %>
+  <%= link_to t("views.tasks.show.edit"), edit_task_path(@task) %>
+  <%= link_to t("views.tasks.show.back"), tasks_path %>
+  <%= button_to t("views.tasks.show.destroy"), @task, method: :delete, data: { turbo_confirm: t("confirm") } %>
 </div>
