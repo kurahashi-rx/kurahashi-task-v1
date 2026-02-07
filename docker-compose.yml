@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:15
+    container_name: my_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password # = に修正し、値を統一
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: my_rails_app
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_PASSWORD=password # db側と一致させる
+      - RAILS_ENV=development
