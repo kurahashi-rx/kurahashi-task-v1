@@ -4,11 +4,24 @@
     <%= link_to t("views.tasks.index.new_task"), new_task_path, class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors" %>
   </div>
 
-  <div id="tasks_list" class="bg-white rounded-lg shadow-sm divide-y divide-gray-100">
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
     <% if @tasks.any? %>
-      <% @tasks.each do |task| %>
-        <%= render task %>
-      <% end %>
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名称</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">内容</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ステータス</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+          </tr>
+        </thead>
+        <tbody id="tasks_list" class="bg-white divide-y divide-gray-100">
+          <% @tasks.each do |task| %>
+            <%# ここで各行を表示。後ほど _task.html.erb も <tr> 形式に合わせる必要があります %>
+            <%= render task %>
+          <% end %>
+        </tbody>
+      </table>
     <% else %>
       <div class="px-6 py-12 text-center text-gray-500">
         <%= t("views.tasks.index.no_tasks") %>
