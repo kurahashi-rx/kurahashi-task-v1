@@ -1,10 +1,16 @@
+<%# タスク一覧メインビュー %>
 <div id="tasks">
+  <%# ヘッダーセクション：タイトルと新規作成ボタン %>
   <div class="flex justify-between items-center mb-8">
+        <%# t("...") は i18n（多言語化）。config/locales/ja.yml の定義を参照 %>
     <h1 class="text-2xl font-medium text-gray-900 tracking-tight"><%= t("views.tasks.index.title") %></h1>
+    <%# new_task_path は Rails の Named Route。Controllerの new アクションへのURLを生成します %>
     <%= link_to t("views.tasks.index.new_task"), new_task_path, class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors" %>
   </div>
 
+  <%# テーブル本体：データの表示ロジック %>
   <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+    <%# @tasks は Controller で設定されたインスタンス変数（Modelのリスト） %>
     <% if @tasks.any? %>
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
@@ -16,13 +22,15 @@
           </tr>
         </thead>
         <tbody id="tasks_list" class="bg-white divide-y divide-gray-100">
+          <%# Javaの for(Task task : tasks) と同じループ処理 %>
           <% @tasks.each do |task| %>
-            <%# ここで各行を表示。後ほど _task.html.erb も <tr> 形式に合わせる必要があります %>
+            <%# Partial Rendering：render task と書くだけで、Railsは自動的に _task.html.erb という名前の「行専用テンプレート」を探して、ループの各要素を流し込みます。%>
             <%= render task %>
           <% end %>
         </tbody>
       </table>
     <% else %>
+      <%# データが空の場合のプレースホルダー %>
       <div class="px-6 py-12 text-center text-gray-500">
         <%= t("views.tasks.index.no_tasks") %>
       </div>

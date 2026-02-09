@@ -1,26 +1,47 @@
+<%# 
+  [タスク入力フォーム]
+  model: task により、新規なら POST /tasks、編集なら PATCH /tasks/@id へ自動で分岐します。
+%>
 <%= form_with(model: task, class: "space-y-6") do |form| %>
+  <%# 
+    エラーメッセージの表示エリア
+    Springの BindingResult からエラーを取り出して表示する処理に相当します。
+  %>
   <% if task.errors.any? %>
     <div id="error_explanation" class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+      <%# t("...") は ja.yml を参照。モデル名(Task)の日本語訳やエラー件数を動的に埋め込みます [cite: 7]。 %>
       <h2 class="font-medium mb-2"><%= t("errors.template.header", count: task.errors.count, model: Task.model_name.human) %></h2>
       <ul class="list-disc list-inside space-y-1">
         <% task.errors.each do |error| %>
+          <%# 属性名（タイトルなど）を含めた読みやすいエラー文章（full_message）を生成します [cite: 8]。 %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
+  <%# 
+    タイトル入力フィールド
+    form.label はデフォルトで ja.yml の activerecord.attributes.task.title を参照します。
+  %>
   <div>
     <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
     <%= form.text_field :title, class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
   </div>
 
+  <%# 内容入力フィールド（複数行） %>
   <div>
     <%= form.label :content, class: "block text-sm font-medium text-gray-700 mb-2" %>
     <%= form.text_area :content, rows: 4, class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
   </div>
 
+  <%# 
+    送信ボタン
+    task.new_record? (Javaでいう task.getId() == null) で、
+    ボタンのラベルを「作成する」か「更新する」かに動的に切り替えています。
+  %>
   <div>
     <%= form.submit(task.new_record? ? t("views.tasks.form.submit_create") : t("views.tasks.form.submit_update"), class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors cursor-pointer") %>
   </div>
 <% end %>
+

@@ -1,9 +1,16 @@
+<%# [新規作成ビュー] %>
 <div>
+  <%# ページタイトル %>
   <h1 class="text-2xl font-medium text-gray-900 tracking-tight mb-8"><%= t("views.tasks.new.title") %></h1>
   <div class="bg-white rounded-lg shadow-sm px-6 py-6">
+    <%# 
+      共通フォームの呼び出し。
+      task: @task と明示的に渡すことで、_form.html.erb 内で変数 task として使えます。 
+    %>
     <%= render "form", task: @task %>
   </div>
   <div class="mt-6">
+    <%# 戻るリンク %>
     <%= link_to t("views.tasks.new.back"), tasks_path, class: "text-sm text-gray-600 hover:text-gray-800" %>
   </div>
 </div>

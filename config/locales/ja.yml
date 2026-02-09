@@ -1,7 +1,6 @@
-# アプリケーション固有の日本語訳
-# rails-i18n が日付・時刻・数値フォーマット等を提供
+# 多言語化定義ファイル ※Springの messages_ja.properties に相当
 ja:
-  # 共通
+  # 汎用的なラベル（ボタン名など）
   "back": "戻る"
   "save": "保存"
   "edit": "編集"
@@ -11,6 +10,7 @@ ja:
   "new": "新規作成"
   "confirm": "本当に実行しますか？"
 
+  # 列挙型の値
   enums:
     task:
       status:
@@ -18,12 +18,13 @@ ja:
         doing: "進行中"
         done: "完了"
 
-  # モデル名
+  # ActiveRecord (ORM) 関連の定義
   activerecord:
+    # モデルの名前
     models:
       task: "タスク"
 
-    # Taskモデルの属性
+    # モデルの属性
     attributes:
       task:
         title: "タイトル"
@@ -31,6 +32,7 @@ ja:
         created_at: "作成日時"
         updated_at: "更新日時"
 
+    # バリデーションエラーメッセージ
     errors:
       messages:
         required: "を入力してください"
@@ -39,8 +41,9 @@ ja:
         too_short: "は%{count}文字以上で入力してください"
         too_long: "は%{count}文字以内で入力してください"
 
-  # ビュー用
+  # 画面ごとの文言
   views:
+    # タスク関連画面
     tasks:
       index:
         title: "タスク一覧"
