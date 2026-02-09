@@ -17,6 +17,10 @@ ja:
         todo: "未着手"
         doing: "進行中"
         done: "完了"
+      priority:
+        p1: "P1 (高)"
+        p2: "P2 (中)"
+        p3: "P3 (低)"
 
   # ActiveRecord (ORM) 関連の定義
   activerecord:
@@ -31,6 +35,8 @@ ja:
         content: "内容"
         created_at: "作成日時"
         updated_at: "更新日時"
+        status: "ステータス"
+        priority: "優先度"
 
     # バリデーションエラーメッセージ
     errors:

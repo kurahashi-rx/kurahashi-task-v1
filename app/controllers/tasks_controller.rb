@@ -62,6 +62,6 @@ class TasksController < ApplicationController
   # Strong Parameters：セキュリティ(マスアサインメント対策)のため
   def task_params
     # 許可した属性のみをDB保存に利用します
-    params.require(:task).permit(:title, :content)
+    params.require(:task).permit(:title, :content, :status, :priority)
   end
 end

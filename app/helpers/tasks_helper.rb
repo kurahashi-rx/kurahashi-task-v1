@@ -1,6 +1,7 @@
 # [Tasksヘルパー]
 # ここに定義したメソッドは app/views/tasks/ 以下のERBで自動的に使えます
 module TasksHelper
+
   # ステータスに応じた Tailwind CSS のクラスを返すメソッド
   def status_badge_class(status)
     case status
@@ -14,4 +15,14 @@ module TasksHelper
       'bg-gray-100 text-gray-800'
     end
   end
+
+  # 優先度に応じてテキストの色（Tailwindクラス）を返す
+    def priority_text_class(priority)
+      case priority
+      when 'p1' then 'text-red-600'    # 高：赤
+      when 'p2' then 'text-yellow-600' # 中：黄色
+      when 'p3' then 'text-blue-600'   # 低：青
+      else 'text-gray-600'
+      end
+    end
 end
