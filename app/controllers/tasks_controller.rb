@@ -7,8 +7,9 @@ class TasksController < ApplicationController
 
   # GET /tasks (Springの @GetMapping)
   def index
-    # 全件取得。SQLの "SELECT * FROM tasks ORDER BY created_at DESC" を発行
-    @tasks = Task.all
+    # 全件取得。優先度(priority)の昇順、その後作成日時(created_at)の降順でソート
+    @tasks = Task.all.order(priority: :asc, created_at: :desc)
+    
   end
 
   # GET /tasks/1
