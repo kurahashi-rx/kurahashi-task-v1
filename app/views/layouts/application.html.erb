@@ -1,32 +1,51 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <%# ページタイトル: 各ビューで content_for(:title) があればそれを使い、なければ "App" を表示 %>
     <title><%= content_for(:title) || "App" %></title>
+    
+    <%# レスポンシブ対応: スマホ等のデバイス幅に合わせる設定 %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    
+    <%# iOSでのWebアプリ化設定: ホーム画面追加時にアプリっぽく振る舞わせる %>
     <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <%# セキュリティ関連 %>
+    <%# CSRF(クロスサイトリクエストフォージェリ)対策用のトークンを生成。JSからのPOST通信などに必須 %>
     <%= csrf_meta_tags %>
+    <%# CSP(コンテンツセキュリティポリシー)設定。不正なスクリプト実行を制限する %>
     <%= csp_meta_tag %>
 
+    <%# ページ個別の meta タグや script を挿入するためのスロット %>
     <%= yield :head %>
 
+    <%# PWA (Progressive Web App) 設定とアイコン類 %>
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# スタイルシートの読み込み %>
+    <%# data-turbo-track: "reload" は、CSSが更新された際にTurboがページをフルリロードするための設定 %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
   </head>
 
+  <%# 画面全体の背景色やフォントをTailwind CSSで指定 %>
   <body class="min-h-screen bg-gray-100 font-sans text-gray-900">
     <div class="min-h-screen py-12 px-4 sm:px-6">
-      <div class="mx-auto max-w-2xl">
+       
+        <%# Flashメッセージ: ユーザーへの通知（保存完了！など）を表示する共通エリア %>
         <% if flash[:notice] %>
           <div class="mb-6 rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-700" role="alert">
             <%= flash[:notice] %>
           </div>
         <% end %>
+
+        <%# メインコンテンツ: index.html.erb などの各ビューの内容がここに挿入される %>
         <%= yield %>
-      </div>
+        
     </div>
   </body>
 </html>

@@ -1,39 +1,49 @@
-<%# タスク一覧メインビュー %>
-<div id="tasks">
-  <%# ヘッダーセクション：タイトルと新規作成ボタン %>
-  <div class="flex justify-between items-center mb-8">
-        <%# t("...") は i18n（多言語化）。config/locales/ja.yml の定義を参照 %>
-    <h1 class="text-2xl font-medium text-gray-900 tracking-tight"><%= t("views.tasks.index.title") %></h1>
-    <%# new_task_path は Rails の Named Route。Controllerの new アクションへのURLを生成します %>
-    <%= link_to t("views.tasks.index.new_task"), new_task_path, class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors" %>
-  </div>
+<%# 修正：位置を fixed (固定) にし、高さを 0 にすることで下の要素を押し下げないようにします %>
+<div id="flash" class="fixed top-0 left-0 w-full z-[9999] pointer-events-none">
+  <%= render "layouts/flash" %>
+</div>
 
-  <%# テーブル本体：データの表示ロジック %>
-  <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
-    <%# @tasks は Controller で設定されたインスタンス変数（Modelのリスト） %>
-    <% if @tasks.any? %>
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="w-24 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">優先度</th>
-            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">名称</th>
-            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">内容</th>
-            <th class="w-32 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ステータス</th>
-            <th class="w-40 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
-          </tr>
-        </thead>
-        <tbody id="tasks_list" class="bg-white divide-y divide-gray-100">
-          <%# Javaの for(Task task : tasks) と同じループ処理 %>
-          <% @tasks.each do |task| %>
-            <%# Partial Rendering：render task と書くだけで、Railsは自動的に _task.html.erb という名前の「行専用テンプレート」を探して、ループの各要素を流し込みます。%>
-            <%= render task %>
-          <% end %>
-        </tbody>
-      </table>
-    <% else %>
-      <%# データが空の場合のプレースホルダー %>
-      <div class="px-6 py-12 text-center text-gray-500">
-        <%= t("views.tasks.index.no_tasks") %>
+<%# 
+  [2ペイン・レイアウトのメイン構造] 
+  h-[calc(100vh-64px)]: 画面の高さ(100vh)からヘッダー分(64px)を引いたぴったりサイズに固定
+  overflow-hidden: 親要素からはみ出た部分を隠し、中身の各ペインで個別にスクロールさせる
+%>
+<div class="flex h-[calc(100vh-64px)] overflow-hidden">
+  <%# 左側：スリムなリストビュー (幅 1/3) %>
+  <%# border-r: 右側に境界線を引き、bg-whiteでリストを際立たせる。overflow-y-autoでここだけスクロール可能に %>
+  <div class="w-1/3 border-r border-gray-200 bg-white overflow-y-auto">
+    <%#  sticky top-0: スクロールしても「タイトルと新規作成ボタン」を常に最上部に固定 %>
+    <div class="sticky top-0 z-10 bg-white p-4 border-b flex justify-between items-center">
+      <%# t(...): 多言語化(I18n)対応。文言を別ファイル管理にするRailsの標準的な書き方 %>
+      <h1 class="text-xl font-bold text-gray-900 tracking-tight"><%= t("views.tasks.index.title") %></h1>
+      <%# data: { turbo_frame: "task_detail" }: 
+          リンクをクリックした際、ページ全体ではなく後述の "task_detail" 枠だけを書き換える指示 %>
+      <%= link_to "+", new_task_path, 
+          data: { turbo_frame: "task_detail" }, 
+          class: "inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+    </div>
+    <%# id="tasks_list": Turbo Streamなどで特定要素だけ更新する際のターゲットになるID %>
+    <div id="tasks_list" class="divide-y divide-gray-100">
+      <%# render @tasks: 
+          _task.html.erb という部分テンプレート（パーシャル）をタスクの数だけ繰り返し表示する魔法の1行 %>
+      <%= render @tasks %>
+    </div>
+  </div>
+  <%# 右側：詳細表示パネル (幅 2/3) %>
+  <%# bg-gray-50: 背景を薄くグレーにして、左側のホワイトリストとコントラストをつける %>
+  <div class="w-2/3 bg-gray-50 overflow-y-auto p-8">
+    <%# 
+      turbo_frame_tag "task_detail":
+      このIDで囲まれた部分が「書き換え専用エリア」になります。
+      左側でタスクを選んだ時、Railsが返す「詳細画面（show）」の内容がこの中だけにスッポリ収まります。
+    %>
+    <%= turbo_frame_tag "task_detail" do %>
+      <%# 初期状態（何も選択していない時）のプレースホルダー表示 %>
+      <div class="flex flex-col items-center justify-center h-full text-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        <p class="text-lg">タスクを選択すると詳細が表示されます</p>
       </div>
     <% end %>
   </div>

@@ -9,11 +9,12 @@ class TasksController < ApplicationController
   def index
     # 全件取得。優先度(priority)の昇順、その後作成日時(created_at)の降順でソート
     @tasks = Task.all.order(priority: :asc, created_at: :desc)
-    
   end
 
   # GET /tasks/1
   def show
+    @task = Task.find(params[:id])
+      render layout: false if turbo_frame_request?
   end
 
   # GET /tasks/new
@@ -23,27 +24,36 @@ class TasksController < ApplicationController
 
   # GET /tasks/1/edit
   def edit
+    # 詳細画面と同様、フレーム内更新ならレイアウトをスキップ
+    render layout: false if turbo_frame_request?
   end
 
   # POST /tasks (Springの @PostMapping)
   def create
     @task = Task.new(task_params)
+      if @task.save
+        # 修正ポイント: redirect用ではなく、今すぐ出すための .now を使う
+        flash.now[:notice] = t("notice.created")
 
-    if @task.save
-      # 保存成功時。t("notice.created") は ja.yml からメッセージ取得 
-      redirect_to @task, notice: t("notice.created")
-    else
-      # バリデーションエラー時は、HTTP 422で新規作成画面を再表示
-      render :new, status: :unprocessable_entity
-    end
+        respond_to do |format|
+          format.turbo_stream # create.turbo_stream.erb を探しに行く
+          format.html { redirect_to @task }
+        end
+      else
+        # バリデーションエラー時は、HTTP 422で新規作成画面を再表示
+        render :new, status: :unprocessable_entity
+      end
   end
 
   # PATCH/PUT /tasks/1
   def update
     if @task.update(task_params)
-      redirect_to @task, notice: t("notice.updated")
+        respond_to do |format|
+          format.turbo_stream # update.turbo_stream.erb を探しに行く
+          format.html { redirect_to @task }
+        end
     else
-      render :edit, status: :unprocessable_entity
+        render :edit, status: :unprocessable_entity
     end
   end
 

@@ -1,18 +1,4 @@
-<div id="<%= dom_id @task %>" class="bg-white rounded-lg shadow-sm px-6 py-6">
-  <div class="space-y-4">
-    <div>
-      <p class="text-xs font-medium text-gray-500 uppercase tracking-wider"><%= Task.human_attribute_name(:title) %></p>
-      <p class="mt-1 text-base text-gray-900"><%= @task.title %></p>
-    </div>
-    <div>
-      <p class="text-xs font-medium text-gray-500 uppercase tracking-wider"><%= Task.human_attribute_name(:content) %></p>
-      <p class="mt-1 text-base text-gray-900 whitespace-pre-wrap"><%= @task.content %></p>
-    </div>
-  </div>
-
-  <div class="mt-8 pt-6 border-t border-gray-100 flex flex-wrap gap-4">
-    <%= link_to t("views.tasks.show.edit"), edit_task_path(@task), class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors" %>
-    <%= link_to t("views.tasks.show.back"), tasks_path, class: "inline-flex items-center px-4 py-2 text-gray-700 bg-white border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors" %>
-    <%= button_to t("views.tasks.show.destroy"), @task, method: :delete, data: { turbo_confirm: t("confirm") }, form: { class: "inline" }, class: "text-sm text-red-600 hover:text-red-700 bg-transparent border-none cursor-pointer p-0 font-normal" %>
-  </div>
-</div>
+<%# [右パネルに表示される詳細コンテンツ] %>
+<%= turbo_frame_tag "task_detail" do %>
+  <%= render "show_content", task: @task %>
+<% end %>
