@@ -2,4 +2,4 @@
 <%= turbo_stream.replace dom_id(@task), partial: "tasks/task", locals: { task: @task } %>
 
 <%# 2. 右側パネルの内容を詳細画面に戻す %>
-<%= turbo_stream.replace "task_detail", partial: "tasks/show_content", locals: { task: @task } %>
+<%= turbo_stream.update "task_detail", partial: "tasks/show_content", locals: { task: @task } %>

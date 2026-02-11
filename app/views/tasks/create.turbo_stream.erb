@@ -2,7 +2,7 @@
 <%= turbo_stream.prepend "tasks_list", partial: "tasks/task", locals: { task: @task } %>
 
 <%# 2. 右側パネルを詳細画面に切り替える %>
-<%= turbo_stream.replace "task_detail", partial: "tasks/show_content", locals: { task: @task } %>
+<%= turbo_stream.update "task_detail", partial: "tasks/show_content", locals: { task: @task } %>
 
 <%# 8行目のコメントアウトを外していることを確認 %>
 <%= turbo_stream.update "flash", partial: "layouts/flash" %>
