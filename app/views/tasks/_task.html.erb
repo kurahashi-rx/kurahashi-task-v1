@@ -1,18 +1,30 @@
 <%# [左リスト用のタスク部品] %>
 <%# 各タスクを dom_id(task) による一意なIDで囲みます %>
 <%= turbo_frame_tag dom_id(task) do %>
-  <%= link_to task, data: { turbo_frame: "task_detail" }, class: "block hover:bg-blue-50 transition-colors border-l-4 border-transparent focus:bg-blue-50 focus:border-blue-500" do %>
-    <div class="p-4">
-      <div class="flex justify-between items-start mb-1">
-        <span class="text-xs font-bold <%= priority_text_class(task.priority) %> uppercase tracking-wider">
+  <%= link_to task_path(task), data: { turbo_frame: "task_detail" }, class: "block p-4 hover:bg-gray-50 transition-colors border-b border-gray-100" do %>
+    <div class="flex flex-col gap-2">
+
+      <%# 上段：優先度とタイトルを横に並べる %>
+      <div class="flex items-center gap-3">
+        <%# 優先度のバッジ %>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium <%= priority_text_class(task.priority) %>">
           <%= task.priority_i18n %>
         </span>
-        <span class="text-[10px] px-2 py-0.5 rounded-full <%= status_badge_class(task.status) %>">
+        <%# タスクタイトル %>
+        <h3 class="text-sm font-semibold text-gray-900 truncate">
+          <%= task.title %>
+        </h3>
+      </div>
+
+      <%# 下段：ステータスや日付（必要であれば） %>
+      <div class="flex items-center justify-between text-xs text-gray-500">
+        <span class="<%= status_badge_class(task.status) %> font-medium">
           <%= task.status_i18n %>
         </span>
+        <span>
+          <%= l task.created_at, format: :short %>
+        </span>
       </div>
-      <h3 class="text-sm font-semibold text-gray-900 truncate"><%= task.title %></h3>
-      <p class="text-xs text-gray-500 mt-1 truncate"><%= task.content %></p>
     </div>
   <% end %>
 <% end %>
