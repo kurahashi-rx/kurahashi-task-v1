@@ -8,7 +8,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
 
   web:
     build: .
@@ -22,3 +22,6 @@ services:
     environment:
       - DATABASE_PASSWORD=password # db側と一致させる
       - RAILS_ENV=development
+
+volumes:
+  db_data:

@@ -33,6 +33,3 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
-
-# ローカル開発用データストア
-/postgres_data
