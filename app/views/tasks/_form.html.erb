@@ -2,7 +2,6 @@
   [タスク入力フォーム]
   model: task により、新規なら POST /tasks、編集なら PATCH /tasks/@id へ自動で分岐します。
 %>
-
 <%= form_with(model: task, class: "space-y-6") do |form| %>
   <%# 
     エラーメッセージの表示エリア
@@ -20,35 +19,76 @@
       </ul>
     </div>
   <% end %>
-
   <%# 
-    タイトル入力フィールド
+    1. 基本情報: タイトル・分類
     form.label はデフォルトで ja.yml の activerecord.attributes.task.title を参照します。
-  %>
-  <div>
-    <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
-    <%= form.text_field :title, class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
+   %>
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="md:col-span-3">
+      <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_field :title, class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
+    </div>
+    <div>
+      <%= form.label :category, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_field :category, placeholder: "例: DEV", class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
+    </div>
   </div>
-  <%# 内容入力フィールド（複数行） %>
-  <div>
-    <%= form.label :content, class: "block text-sm font-medium text-gray-700 mb-2" %>
-    <%= form.text_area :content, rows: 4, class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
+  <%# 2. ステータス・優先度・SP (3列並び) %>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div>
+      <%= form.label :status, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.select :status, 
+          Task.statuses.keys.map { |k| [I18n.t("activerecord.enums.task.status.#{k}"), k] }, 
+          {}, 
+          class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
+    </div>
+    <div>
+      <%= form.label :priority_group, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.select :priority_group, 
+          Task.priority_groups.keys.map { |k| [I18n.t("activerecord.enums.task.priority_group.#{k}"), k] }, 
+          {}, 
+          class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
+    </div>
+    <div>
+      <%= form.label :story_point, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.select :story_point, 
+          Task.story_points.keys.map { |k| [I18n.t("activerecord.enums.task.story_point.#{k}"), k] }, 
+          {}, 
+          class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
+    </div>
   </div>
-  <%# 優先度 %>
+  <%# 3. 価値 (Value) %>
   <div>
-    <%= form.label :priority, class: "block text-sm font-medium text-gray-700 mb-2" %>
-    <%= form.select :priority, 
-        Task.priorities.keys.map { |k| [Task.human_attribute_name("priority.#{k}"), k] }, 
-        {}, 
-        class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
+    <%= form.label :value, class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <%= form.text_area :value, rows: 2, placeholder: "このタスクを達成することで提供できる価値...", class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
   </div>
-
+  <%# 4. 完了定義 (DoD) %>
+  <div>
+    <%= form.label :definition_of_done, class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <%= form.text_area :definition_of_done, rows: 2, placeholder: "何をもって完了とするか...", class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
+  </div>
+  <%# 5. 手順 (Procedures) %>
+  <div>
+    <%= form.label :procedures, class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <%= form.text_area :procedures, rows: 6, placeholder: "マークダウン形式で手順を記載...", class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
+  </div>
+  <%# 6. 並び替え・完了日 %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <%= form.label :sort_order, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.number_field :sort_order, class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
+    </div>
+    <div>
+      <%= form.label :completed_on, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.date_field :completed_on, class: "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base" %>
+    </div>
+  </div>
   <%# 
     送信ボタン
     task.new_record? (Javaでいう task.getId() == null) で、
     ボタンのラベルを「作成する」か「更新する」かに動的に切り替えています。
   %>
-  <div>
-    <%= form.submit(task.new_record? ? t("views.tasks.form.submit_create") : t("views.tasks.form.submit_update"), class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors cursor-pointer") %>
+  <div class="pt-4">
+    <%= form.submit(task.new_record? ? t("views.tasks.form.submit_create") : t("views.tasks.form.submit_update"), class: "inline-flex items-center px-6 py-3 bg-blue-600 text-white text-base font-medium rounded-md hover:bg-blue-700 transition-colors cursor-pointer shadow-md") %>
   </div>
 <% end %>

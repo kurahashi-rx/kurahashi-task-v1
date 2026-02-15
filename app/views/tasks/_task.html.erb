@@ -1,26 +1,36 @@
 <%# [左リスト用のタスク部品] %>
 <%# 各タスクを dom_id(task) による一意なIDで囲みます %>
 <%= turbo_frame_tag dom_id(task) do %>
-  <%= link_to task_path(task), data: { turbo_frame: "task_detail" }, class: "block p-4 hover:bg-gray-50 transition-colors border-b border-gray-100" do %>
+  <%= link_to task_path(task), data: { turbo_frame: "task_detail" }, class: "block p-4 hover:bg-blue-50 transition-colors border-b border-gray-100" do %>
     <div class="flex flex-col gap-2">
-
-      <%# 上段：優先度とタイトルを横に並べる %>
-      <div class="flex items-center gap-3">
-        <%# 優先度のバッジ %>
-        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium <%= priority_text_class(task.priority) %>">
-          <%= task.priority_i18n %>
-        </span>
-        <%# タスクタイトル %>
+      <%# 1段目：分類(category) と タイトル %>
+      <div class="flex items-center gap-2">
+        <% if task.category.present? %>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-gray-100 text-gray-600 uppercase">
+            <%= task.category %>
+          </span>
+        <% end %>
         <h3 class="text-sm font-semibold text-gray-900 truncate">
           <%= task.title %>
         </h3>
       </div>
-
-      <%# 下段：ステータスや日付（必要であれば） %>
-      <div class="flex items-center justify-between text-xs text-gray-500">
-        <span class="<%= status_badge_class(task.status) %> font-medium">
+      <%# 2段目：優先度(priority_group)、ステータス、ストーリーポイント %>
+      <div class="flex items-center flex-wrap gap-2 text-[11px]">
+        <%# 優先度グループ (P1, P2... のみ表示) %>
+        <span class="font-bold <%= priority_group_text_class(task.priority_group) %>">
+          <%= task.priority_group_i18n.split('：').first %>
+        </span>
+        <%# ステータスバッジ %>
+        <span class="px-2 py-0.5 rounded-full font-medium <%= status_badge_class(task.status) %>">
           <%= task.status_i18n %>
         </span>
+        <%# ストーリーポイント (1pt, 3pt... のみ表示) %>
+        <span class="text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-200">
+          <%= task.story_point_i18n.split('：').first %>pt
+        </span>
+      </div>
+      <%# 3段目：日付など（補助情報） %>
+      <div class="flex items-center justify-end text-[10px] text-gray-400">
         <span>
           <%= l task.created_at, format: :short %>
         </span>

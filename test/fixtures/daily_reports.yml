@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  report_on: 2026-02-14
+  work_hours: 1.5
+  meeting_hours: 1.5
+  target_point: 1
+  actual_point: 1
+  reflection: MyText
+  comment: MyText
+
+two:
+  report_on: 2026-02-14
+  work_hours: 1.5
+  meeting_hours: 1.5
+  target_point: 1
+  actual_point: 1
+  reflection: MyText
+  comment: MyText

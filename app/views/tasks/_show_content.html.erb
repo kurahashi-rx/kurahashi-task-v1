@@ -1,28 +1,50 @@
 <div class="bg-white shadow-sm rounded-xl p-8 border border-gray-100">
-  <div class="flex justify-between items-start mb-6">
+  <%# ヘッダー：ステータス、タイトル、ボタン %>
+  <div class="flex justify-between items-start mb-6 pb-6 border-b border-gray-100">
     <div>
-      <span class="px-3 py-1 rounded-full text-xs font-bold <%= status_badge_class(@task.status) %> mb-2 inline-block">
-        <%= @task.status_i18n %>
-      </span>
-      <h1 class="text-3xl font-bold text-gray-900"><%= @task.title %></h1>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-3 py-1 rounded-full text-xs font-bold <%= status_badge_class(task.status) %>">
+          <%= task.status_i18n %>
+        </span>
+        <% if task.category.present? %>
+          <span class="text-xs font-mono bg-gray-100 text-gray-500 px-2 py-1 rounded"><%= task.category %></span>
+        <% end %>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-900"><%= task.title %></h1>
     </div>
     <div class="flex gap-2">
-      <%= link_to "編集", edit_task_path(@task), class: "px-4 py-2 bg-gray-100 text-sm font-medium rounded-lg hover:bg-gray-200" %>
-      <%= button_to "削除", @task, method: :delete, data: { turbo_confirm: t("confirm") }, class: "px-4 py-2 bg-red-50 text-red-600 text-sm font-medium rounded-lg hover:bg-red-100" %>
+      <%= link_to "編集", edit_task_path(task), class: "px-4 py-2 bg-gray-100 text-sm font-medium rounded-lg hover:bg-gray-200" %>
+      <%= button_to "削除", task, method: :delete, data: { turbo_confirm: t("confirm") }, class: "px-4 py-2 bg-red-50 text-red-600 text-sm font-medium rounded-lg hover:bg-red-100" %>
     </div>
   </div>
-  <div class="prose max-w-none text-gray-700">
-    <h4 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">内容</h4>
-    <div class="whitespace-pre-wrap"><%= @task.content %></div>
+  <%# メインコンテンツ %>
+  <div class="space-y-8">
+    <section>
+      <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">目的 / 価値</h4>
+      <div class="text-gray-700 bg-gray-50 p-4 rounded-lg whitespace-pre-wrap"><%= task.value.presence || "未設定" %></div>
+    </section>
+    <section>
+      <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">完了定義 (DoD)</h4>
+      <div class="text-gray-700 bg-gray-50 p-4 rounded-lg whitespace-pre-wrap"><%= task.definition_of_done.presence || "未設定" %></div>
+    </section>
+    <section>
+      <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">手順</h4>
+      <div class="text-gray-700 border border-gray-100 p-4 rounded-lg whitespace-pre-wrap shadow-inner min-h-[100px]"><%= task.procedures.presence || "手順未登録" %></div>
+    </section>
   </div>
-  <div class="mt-8 pt-8 border-t border-gray-100 grid grid-cols-2 gap-4">
+  <%# メタデータエリア %>
+  <div class="mt-8 pt-8 border-t border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-6">
     <div>
-      <h4 class="text-xs font-bold text-gray-400 uppercase mb-1">優先度</h4>
-      <p class="font-bold <%= priority_text_class(@task.priority) %>"><%= @task.priority_i18n %></p>
+      <h4 class="text-[10px] font-bold text-gray-400 uppercase mb-1">優先度</h4>
+      <p class="text-sm font-bold <%= priority_group_text_class(task.priority_group) %>"><%= task.priority_group_i18n %></p>
     </div>
     <div>
-      <h4 class="text-xs font-bold text-gray-400 uppercase mb-1">作成日時</h4>
-      <p class="text-sm text-gray-600"><%= l @task.created_at, format: :long %></p>
+      <h4 class="text-[10px] font-bold text-gray-400 uppercase mb-1">ストーリーポイント</h4>
+      <p class="text-sm font-bold text-blue-600"><%= task.story_point_i18n %></p>
+    </div>
+    <div>
+      <h4 class="text-[10px] font-bold text-gray-400 uppercase mb-1">作成日時</h4>
+      <p class="text-[11px] text-gray-500 font-mono"><%= l task.created_at, format: :long %></p>
     </div>
   </div>
 </div>

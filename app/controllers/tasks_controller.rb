@@ -7,8 +7,8 @@ class TasksController < ApplicationController
 
   # GET /tasks (Springの @GetMapping)
   def index
-    # 全件取得。優先度(priority)の昇順、その後作成日時(created_at)の降順でソート
-    @tasks = Task.all.order(priority: :asc, created_at: :desc)
+    # 全件取得。優先度(priority_group)の昇順、その後作成日時(created_at)の降順でソート
+    @tasks = Task.all.order(priority_group: :asc, created_at: :desc)
   end
 
   # GET /tasks/1
@@ -72,7 +72,17 @@ class TasksController < ApplicationController
 
   # Strong Parameters：セキュリティ(マスアサインメント対策)のため
   def task_params
-    # 許可した属性のみをDB保存に利用します
-    params.require(:task).permit(:title, :content, :status, :priority)
+    params.require(:task).permit(
+      :status,
+      :category,
+      :title,
+      :value,
+      :definition_of_done,
+      :procedures,
+      :priority_group,
+      :story_point,
+      :sort_order,
+      :completed_on
+    )
   end
 end

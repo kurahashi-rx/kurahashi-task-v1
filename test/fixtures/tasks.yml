@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  status: MyString
+  category: MyString
+  title: MyString
+  value: MyText
+  definition_of_done: MyText
+  procedures: MyText
+  priority_group: MyString
+  story_point: 1
+  sort_order: 1
+  completed_on: 2026-02-14
+
+two:
+  status: MyString
+  category: MyString
+  title: MyString
+  value: MyText
+  definition_of_done: MyText
+  procedures: MyText
+  priority_group: MyString
+  story_point: 1
+  sort_order: 1
+  completed_on: 2026-02-14

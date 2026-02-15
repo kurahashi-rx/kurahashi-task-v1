@@ -10,16 +10,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_02_09_115830) do
+ActiveRecord::Schema[7.2].define(version: 2026_02_14_093459) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "tasks", force: :cascade do |t|
-    t.string "title"
-    t.text "content"
+  create_table "daily_reports", force: :cascade do |t|
+    t.date "report_on"
+    t.float "work_hours"
+    t.float "meeting_hours"
+    t.integer "target_point"
+    t.integer "actual_point"
+    t.text "reflection"
+    t.text "comment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "status"
-    t.integer "priority"
+    t.index ["report_on"], name: "index_daily_reports_on_report_on"
+  end
+
+  create_table "tasks", force: :cascade do |t|
+    t.string "status"
+    t.string "category"
+    t.string "title"
+    t.text "value"
+    t.text "definition_of_done"
+    t.text "procedures"
+    t.string "priority_group"
+    t.integer "story_point"
+    t.integer "sort_order"
+    t.date "completed_on"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 end
