@@ -1,4 +1,4 @@
-# 多言語化定義ファイル ※Springの messages_ja.properties に相当
+# 多言語化定義ファイル
 ja:
   # 汎用的なラベル（ボタン名など）
   "back": "戻る"
@@ -10,33 +10,25 @@ ja:
   "new": "新規作成"
   "confirm": "本当に実行しますか？"
 
-  # 列挙型の値
-  enums:
-    task:
-      status:
-        todo: "未着手"
-        doing: "進行中"
-        done: "完了"
-      priority:
-        p1: "P1 (高)"
-        p2: "P2 (中)"
-        p3: "P3 (低)"
-
   # ActiveRecord (ORM) 関連の定義
   activerecord:
     # モデルの名前
     models:
-      task: "タスク"
+      task: "タスク内容"
 
     # モデルの属性
     attributes:
       task:
-        title: "タイトル"
-        content: "内容"
-        created_at: "作成日時"
-        updated_at: "更新日時"
         status: "ステータス"
-        priority: "優先度"
+        category: "分類"
+        title: "名称"
+        value: "価値"
+        definition_of_done: "完了定義"
+        procedures: "手順"
+        priority_group: "優先度グループ"
+        story_point: "ストーリーポイント"
+        sort_order: "並べ替え順"
+        completed_on: "完了日"
 
     # バリデーションエラーメッセージ
     errors:
@@ -46,6 +38,29 @@ ja:
         blank: "を入力してください"
         too_short: "は%{count}文字以上で入力してください"
         too_long: "は%{count}文字以内で入力してください"
+
+    # 列挙型の値
+    enums:
+      task:
+        status:
+          backlog: "バックログ"
+          ready: "未着手(Ready)"
+          sprint: "スプリント中"
+          done: "完了"
+        priority_group:
+          p1: "P1：他者が止まるorリスク高"
+          p2: "P2：今日完了で価値あり"
+          p3: "P3：明日以降でもよい"
+        story_point:
+          sp0: "0：雑務"
+          sp1: "1：小口化タスク"
+          sp3: "3：要思考、やり方不明点なし"
+          sp5: "5：厄介、初めてのタスク"
+        story_point:
+          point_0: "0：雑務"
+          point_1: "1：小口化タスク"
+          point_3: "3：要思考、やり方不明点なし"
+          point_5: "5：厄介、初めてのタスク"
 
   # 画面ごとの文言
   views:
