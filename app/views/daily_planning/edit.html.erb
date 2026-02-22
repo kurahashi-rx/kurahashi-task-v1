@@ -1,1 +1,65 @@
-こんにちは！
+<%# app/views/daily_planning/edit.html.erb %>
+<div class="container mx-auto p-8">
+  <header class="mb-8 border-b pb-4">
+    <h1 class="text-3xl font-bold">デイリープランニング</h1>
+    <p class="text-sm opacity-70"><%= @daily_report.report_on.strftime("%Y年%m月%d日") %></p>
+  </header>
+
+  <%= form_with model: @daily_report, url: daily_planning_path, method: :patch do |f| %>
+    
+    <%# 1. リソース入力エリア %>
+    <section class="mb-10 p-6 border rounded-lg shadow-sm">
+      <h2 class="text-xl font-semibold mb-4 text-blue-600">今日のキャパシティ設定</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+        <div>
+          <%= f.label :work_hours, "勤務時間 (h)", class: "block text-sm font-medium mb-2" %>
+          <%= f.number_field :work_hours, step: 0.5, class: "w-full border rounded px-3 py-2" %>
+        </div>
+        <div>
+          <%= f.label :meeting_hours, "会議時間 (h)", class: "block text-sm font-medium mb-2" %>
+          <%= f.number_field :meeting_hours, step: 0.5, class: "w-full border rounded px-3 py-2" %>
+        </div>
+        <div class="border p-4 rounded text-center bg-gray-50">
+          <span class="block text-xs opacity-70">集中可能時間</span>
+          <span class="text-2xl font-mono font-bold"><%= @daily_report.available_focus_time %></span> <span class="text-sm">h</span>
+        </div>
+        <div>
+          <%= f.label :target_point, "目標ポイント", class: "block text-sm font-medium mb-2" %>
+          <%= f.number_field :target_point, class: "w-full border rounded px-3 py-2" %>
+        </div>
+      </div>
+    </section>
+
+    <%# 2. タスク選択（2カラム）エリア %>
+    <div class="flex flex-col lg:flex-row gap-8">
+      
+      <%# 左：バックログ %>
+      <div class="flex-1 p-4 border rounded-lg">
+        <h2 class="text-lg font-bold mb-4 flex justify-between items-center">
+          <span>未着手バックログ</span>
+          <span class="text-xs border px-2 py-1 rounded opacity-50"><%= @backlog_tasks.count %> tasks</span>
+        </h2>
+        <div class="space-y-3 min-h-[300px]">
+          <p class="text-sm italic text-center py-10 opacity-50">（ここにバックログを表示）</p>
+        </div>
+      </div>
+
+      <%# 右：今日のスプリント %>
+      <div class="flex-1 p-4 border-2 border-blue-100 rounded-lg shadow-inner">
+        <h2 class="text-lg font-bold mb-4 text-blue-700 flex justify-between items-center">
+          <span>今日やること (TODO)</span>
+          <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"><%= @today_tasks.count %> tasks</span>
+        </h2>
+        <div class="space-y-3 min-h-[300px] bg-blue-50/30 rounded p-2 border border-dashed">
+          <p class="text-sm italic text-center py-10 opacity-50">（ここに今日やるタスクを表示）</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="mt-10 text-right">
+      <%= f.submit "今日の計画を保存して開始", class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-10 rounded-full shadow-lg cursor-pointer" %>
+    </div>
+
+  <% end %>
+</div>

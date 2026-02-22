@@ -16,4 +16,10 @@ class DailyReport < ApplicationRecord
   def recommended_target_point
     (available_focus_time * 2.0).floor # 例: 集中1時間につき2pt換算など
   end
+
+  def available_focus_time
+    return 0.0 unless work_hours && meeting_hours
+    work_hours - meeting_hours
+  end
+
 end
