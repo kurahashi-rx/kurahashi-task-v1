@@ -9,6 +9,7 @@
       <%# PC向けメニュー: 'sm:flex'で画面幅が一定以上の場合のみ表示 %>
       <div class="hidden sm:flex sm:items-center sm:space-x-4">
         <%# link_to と 多言語化(tメソッド)を組み合わせたリンク生成 %>
+        <%= link_to t("views.daily_planning.index.title"), edit_daily_planning_path, class: "text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-200" %>
         <%= link_to t("views.tasks.index.title"), tasks_path, class: "text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-200" %>
         <%= link_to t("views.tasks.new.title"), new_task_path, class: "text-sm font-medium px-4 py-2 border border-blue-600 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-200 shadow-sm" %>
       </div>

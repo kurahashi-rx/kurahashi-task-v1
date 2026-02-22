@@ -89,6 +89,9 @@ ja:
         show: "このタスクを表示"
         edit: "このタスクを編集"
         destroy: "このタスクを削除"
+    daily_planning:
+      index:
+        title: "プラン"
 
   # フラッシュメッセージ
   notice:
