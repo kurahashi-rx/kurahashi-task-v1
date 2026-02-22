@@ -1,5 +1,5 @@
 /*
- * application.tailwind.css は Tailwind の入力ファイルとして別途処理されます。
- * require_tree を削除して @tailwind ディレクティブのパースエラーを防ぎます。
+ * このファイルは Tailwind CSS 導入により application.tailwind.css へ統合されました。
+ * 重複を避けるため、独自のスタイルはあちらに記述してください。
  */
-*= require_self
+ 

@@ -1,18 +1,25 @@
-<%# 1. Stimulusの'navbar'コントローラをこの範囲に適用 %>
-<nav data-controller="navbar" class="bg-white shadow-sm">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6">
-    <div class="flex justify-between h-16 items-center">
-      <div class="flex items-center">
-        <%# ロゴ部分: クリックでトップページ(root_path)へ遷移 %>
-        <a href="<%= root_path %>" class="text-lg font-bold">MyApp</a>
+<%# 修正ポイント: max-w-7xl を削除し、w-full に変更。mx-auto も不要になります %>
+<nav data-controller="navbar" class="strong-bg border-b border-border-strong shadow-sm">
+  <div class="w-full px-4 sm:px-8"> 
+    <div class="flex justify-start h-16 items-center space-x-8">
+      
+      <%# ロゴ %>
+      <div class="flex-shrink-0">
+        <a href="<%= root_path %>" class="text-xl font-bold text-[var(--text-white)] tracking-tight">MyApp</a>
       </div>
-      <%# PC向けメニュー: 'sm:flex'で画面幅が一定以上の場合のみ表示 %>
-      <div class="hidden sm:flex sm:items-center sm:space-x-4">
-        <%# link_to と 多言語化(tメソッド)を組み合わせたリンク生成 %>
-        <%= link_to t("views.daily_planning.index.title"), edit_daily_planning_path, class: "text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-200" %>
-        <%= link_to t("views.tasks.index.title"), tasks_path, class: "text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-200" %>
-        <%= link_to t("views.tasks.new.title"), new_task_path, class: "text-sm font-medium px-4 py-2 border border-blue-600 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-200 shadow-sm" %>
+
+      <%# メニュー %>
+      <div class="hidden sm:flex sm:items-center sm:space-x-6">
+        <%= link_to t("views.daily_planning.index.title"), edit_daily_planning_path, 
+            class: "text-sm font-medium text-[var(--text-white)] opacity-80 hover:opacity-100 transition-opacity" %>
+        
+        <%= link_to t("views.tasks.index.title"), tasks_path, 
+            class: "text-sm font-medium text-[var(--text-white)] opacity-80 hover:opacity-100 transition-opacity" %>
+
+        <%= link_to t("views.tasks.new.title"), new_task_path, 
+            class: "ml-2 text-sm font-bold px-4 py-1.5 bg-[var(--accent-warm)] text-[var(--text-default)] rounded-md hover:brightness-110 transition-all shadow-sm" %>
       </div>
+
     </div>
   </div>
 </nav>

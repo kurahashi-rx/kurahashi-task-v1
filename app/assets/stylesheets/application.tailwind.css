@@ -1,3 +1,77 @@
+:root {
+  /* --- Border (境界線) --- */
+  --border-color: #4B5563;        /* 深めのグレー（メイン） */
+  --border-strong: #243447;       /* 落ち着いたネイビー（強調用） */
+  --border-width: 1px;
+  --border-strong-width: 1.5px;
+  --border-radius: 0.5rem;
+
+  /* --- Background / Earth tones (背景・アースカラー) --- */
+  --bg-base: #F6F1EA;             /* ベース（薄ベージュ） */
+  --bg-muted: #EFE7DB;            /* やや濃いサンド */
+  --bg-soft-green: #E6F2EA;       /* 落ち着いた薄いグリーン */
+  --bg-strong-green: #1F685E;     /* 濃いグリーン（ナビバー等に推奨） */
+  
+  /* --- Accent & Text (アクセント・文字) --- */
+  --accent-warm: #C6A77A;         /* 温かみのあるサンド/ベージュ */
+  --text-default: #0F172A;        /* ダークネイビー（本文） */
+  --text-white: #FFFFFF;          /* 純白 */
+}
+
+/* ページ全体の基本スタイル */
+body {
+  background-color: var(--bg-base);
+  color: var(--text-default);
+}
+
+@layer components {
+  /* カードデザイン */
+  .card {
+    background-color: var(--bg-base);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+  }
+
+  .card-strong {
+    background-color: var(--bg-muted);
+    border: var(--border-strong-width) solid var(--border-strong);
+  }
+
+  /* フォーム入力 */
+  .form-field {
+    background-color: white;
+    border: var(--border-width) solid var(--border-color);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+  }
+
+  /* 背景色バリエーション */
+  .soft-bg {
+    background-color: var(--bg-soft-green);
+  }
+
+  .strong-bg {
+    background-color: var(--bg-strong-green);
+    color: var(--text-white); /* 濃い背景なので文字を白に */
+  }
+
+  .divider {
+    border-top: var(--border-width) solid var(--border-color);
+    margin: 0.75rem 0;
+  }
+}
+
+@layer utilities {
+  .border-strong { 
+    border-color: var(--border-strong) !important; 
+    border-width: var(--border-strong-width) !important; 
+  }
+  .bg-earth { background-color: var(--bg-base) !important; }
+  .bg-earth-muted { background-color: var(--bg-muted) !important; }
+}
+
+/* Tailwind標準ディレクティブ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
