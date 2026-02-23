@@ -12,3 +12,6 @@ application.register("hello", HelloController)
 
 import NavbarController from "./navbar_controller"
 application.register("navbar", NavbarController)
+
+import DrawerController from "./drawer_controller"
+application.register("drawer", DrawerController)
