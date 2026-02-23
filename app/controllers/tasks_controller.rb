@@ -21,14 +21,21 @@ class TasksController < ApplicationController
   # 一覧表示
   # GET /tasks
   def index
-    # 複数ステータスによるフィルタリングをサポート
-    # params[:statuses] はチェックボックス等で送られる配列を想定
-    selected = Array(params[:statuses]).select(&:present?)
+    # 1. パラメータがあればそれを使用し、なければデフォルト値（done以外）を設定
+    if params[:statuses].present?
+      selected = Array(params[:statuses]).select(&:present?)
+    else
+      # 初期表示：done 以外のステータスをすべて選択状態にする
+      selected = Task.statuses.keys - ["done"]
+    end
+
     @selected_statuses = selected
 
-    scope = Task.all
+    # 2. フィルタリングの実行
+    scope = Task.all  
     scope = scope.where(status: selected) if selected.any?
     @tasks = scope.order(priority_group: :asc, created_at: :desc)
+
   end
 
   # 1件の明細表示
