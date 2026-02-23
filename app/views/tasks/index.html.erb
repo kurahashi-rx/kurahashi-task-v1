@@ -8,37 +8,31 @@
   overflow-hidden: 親要素からはみ出た部分を隠し、中身の各ペインで個別にスクロールさせる
 %>
 <div class="flex h-[calc(100vh-64px)] overflow-hidden">
-  <%# 左側：スリムなリストビュー (幅 1/3) %>
-  <%# border-r: 右側に境界線を引き、bg-whiteでリストを際立たせる。overflow-y-autoでここだけスクロール可能に %>
-  <div class="w-1/3 border-r border-gray-200 bg-white overflow-y-auto">
+    <%# 左側：スリムなリストビュー (幅 1/3) %>
+  <div class="w-1/3 pane-divider-r bg-[var(--bg-white)] overflow-y-auto">
+    
     <%#  sticky top-0: スクロールしても「タイトルと新規作成ボタン」を常に最上部に固定 %>
-    <div class="sticky top-0 z-10 bg-white p-4 border-b flex justify-between items-center">
-      <%# t(...): 多言語化(I18n)対応。文言を別ファイル管理にするRailsの標準的な書き方 %>
-      <h1 class="text-xl font-bold text-gray-900 tracking-tight"><%= t("views.tasks.index.title") %></h1>
-      <%# data: { turbo_frame: "task_detail" }: 
-          リンクをクリックした際、ページ全体ではなく後述の "task_detail" 枠だけを書き換える指示 %>
+    <div class="sticky top-0 z-10 bg-[var(--bg-white)] p-4 border-b border-[var(--border-color)] flex justify-between items-center">
+      <h1 class="text-xl font-bold text-[var(--text-default)] tracking-tight">
+        <%= t("views.tasks.index.title") %>
+      </h1>
+      <%# 新規作成ボタン %>
       <%= link_to "+", new_task_path, 
           data: { turbo_frame: "task_detail" }, 
-          class: "inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+          class: "inline-flex items-center px-3 py-1 bg-[var(--accent-warm)] text-[var(--text-default)] rounded-md hover:brightness-110 shadow-sm" %>
     </div>
-    <%# id="tasks_list": Turbo Streamなどで特定要素だけ更新する際のターゲットになるID %>
-    <div id="tasks_list" class="divide-y divide-gray-100">
-      <%# render @tasks: 
-          _task.html.erb という部分テンプレート（パーシャル）をタスクの数だけ繰り返し表示する魔法の1行 %>
+
+    <%# リスト区切り - divide-gray-100 を共通色へ %>
+    <div id="tasks_list">
       <%= render @tasks %>
     </div>
   </div>
+
   <%# 右側：詳細表示パネル (幅 2/3) %>
-  <%# bg-gray-50: 背景を薄くグレーにして、左側のホワイトリストとコントラストをつける %>
-  <div class="w-2/3 bg-gray-50 overflow-y-auto p-8">
-    <%# 
-      turbo_frame_tag "task_detail":
-      このIDで囲まれた部分が「書き換え専用エリア」になります。
-      左側でタスクを選んだ時、Railsが返す「詳細画面（show）」の内容がこの中だけにスッポリ収まります。
-    %>
+  <div class="w-2/3 bg-[var(--bg-muted)] overflow-y-auto p-8">
     <%= turbo_frame_tag "task_detail" do %>
-      <%# 初期状態（何も選択していない時）のプレースホルダー表示 %>
-      <div class="flex flex-col items-center justify-center h-full text-gray-400">
+    <%# 初期状態（何も選択していない時）のプレースホルダー表示 %>
+        <div class="flex flex-col items-center justify-center h-full text-[var(--text-default)] opacity-30">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>

@@ -1,16 +1,20 @@
+/* 共通変数 */
 :root {
   /* --- Border (境界線) --- */
-  --border-color: #4B5563;        /* 深めのグレー（メイン） */
-  --border-strong: #243447;       /* 落ち着いたネイビー（強調用） */
+  --border-color: #D1C7B7;        /* 既存より少し濃いベージュ系グレー */
   --border-width: 1px;
-  --border-strong-width: 1.5px;
   --border-radius: 0.5rem;
+
+  --border-strong: #374151;       /* 分割線用：しっかりとしたグレー */
+  --border-strong-width: 2px;     /* 1.5px から 2px にして差を明確に */
+  --border-strong-width: 1.5px;
 
   /* --- Background / Earth tones (背景・アースカラー) --- */
   --bg-base: #F6F1EA;             /* ベース（薄ベージュ） */
   --bg-muted: #EFE7DB;            /* やや濃いサンド */
   --bg-soft-green: #E6F2EA;       /* 落ち着いた薄いグリーン */
   --bg-strong-green: #1F685E;     /* 濃いグリーン（ナビバー等に推奨） */
+  --bg-white: #FFFFFF;
   
   /* --- Accent & Text (アクセント・文字) --- */
   --accent-warm: #C6A77A;         /* 温かみのあるサンド/ベージュ */
@@ -24,6 +28,7 @@ body {
   color: var(--text-default);
 }
 
+/* 部品：Tailwindがもともと持っている「ユーティリティ（mx-4 など）」よりも優先度が低くなり、HTML側でクラスを追加したときに上書きしやすくなります。*/
 @layer components {
   /* ナビゲーション用のボタン共通スタイル */
   .nav-button {
@@ -79,18 +84,77 @@ body {
     border-top: var(--border-width) solid var(--border-color);
     margin: 0.75rem 0;
   }
+
+  /* 2ペインの境界線用 */
+  .pane-border-r {
+    border-right: var(--border-width) solid var(--border-color);
+  }
+  
+  /* リスト項目同士の区切り */
+  .list-divide {
+    @apply divide-y;
+    border-color: var(--border-color);
+  }
+
+  /* 2ペインの縦の仕切り線 */
+  .pane-divider-r {
+    border-right: 1px solid var(--border-color);
+  }
+
+  /* リスト項目（タスク）のスタイル */
+  .list-item-action {
+    @apply block p-4 transition-colors;
+    background-color: var(--bg-white);
+    border-bottom: 1px solid var(--border-color);
+  }
+  .list-item-action:hover {
+    background-color: var(--bg-soft-green); /* ホバー時にアースカラーの緑を薄く出す */
+  }
+
+  /* 汎用ボタン：枠線あり */
+  .btn-outline {
+    @apply px-4 py-1.5 text-sm font-medium border rounded-md transition-all duration-200 shadow-sm;
+    border-color: var(--border-color);
+    color: var(--text-default);
+    background-color: var(--bg-white);
+  }
+  .btn-outline:hover {
+    background-color: var(--bg-soft-green);
+    border-color: var(--bg-strong-green);
+  }
+
+  /* 削除などの警告用ボタン */
+  .btn-danger {
+    @apply px-4 py-1.5 text-sm font-medium bg-red-50 text-red-600 border border-red-200 rounded-md transition-all shadow-sm;
+  }
+  .btn-danger:hover {
+    @apply bg-red-600 text-white border-red-600;
+  }
+
+  /* セクションの見出しラベル */
+  .detail-label {
+    @apply text-[11px] font-bold uppercase tracking-wider mb-1;
+    color: var(--text-default);
+    opacity: 0.5;
+  }
+
 }
 
+/* 部品：ここは最も優先度が高くなります。特定の1機能だけを強力に上書きしたいクラスをここに書きます 。 */
 @layer utilities {
   .border-strong { 
     border-color: var(--border-strong) !important; 
     border-width: var(--border-strong-width) !important; 
   }
-  .bg-earth { background-color: var(--bg-base) !important; }
+  .bg-base { background-color: var(--bg-base) !important; }
   .bg-earth-muted { background-color: var(--bg-muted) !important; }
 }
 
-/* Tailwind標準ディレクティブ */
+/* Tailwind標準ディレクティブ
+@tailwind base: ブラウザの標準スタイルをリセットする土台を読み込みます 。
+@tailwind components: Tailwind標準の部品（もしあれば）と、@layer components に書いた内容をここに展開します 。
+@tailwind utilities: Tailwindの全クラス（flex, pt-4 など）と、@layer utilities に書いた内容をここに展開します 。
+*/
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -1,50 +1,52 @@
-<div class="bg-white shadow-sm rounded-xl p-8 border border-gray-100">
-  <%# ヘッダー：ステータス、タイトル、ボタン %>
-  <div class="flex justify-between items-start mb-6 pb-6 border-b border-gray-100">
+<%# タスク詳細コンテンツ %>
+<div class="max-w-4xl mx-auto space-y-6">
+  <%# ヘッダーエリア：タイトルと操作ボタン %>
+  <div class="flex justify-between items-start border-b border-[var(--border-color)] pb-4">
     <div>
-      <div class="flex items-center gap-2 mb-2">
-        <span class="px-3 py-1 rounded-full text-xs font-bold <%= status_badge_class(task.status) %>">
-          <%= task.status_i18n %>
-        </span>
-        <% if task.category.present? %>
-          <span class="text-xs font-mono bg-gray-100 text-gray-500 px-2 py-1 rounded"><%= task.category %></span>
-        <% end %>
-      </div>
-      <h1 class="text-3xl font-bold text-gray-900"><%= task.title %></h1>
+      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[var(--bg-soft-green)] text-[var(--bg-strong-green)] mb-2">
+        <%= task.category %>
+      </span>
+      <h2 class="text-3xl font-bold text-[var(--text-default)]"><%= task.title %></h2>
     </div>
+    
     <div class="flex gap-2">
-      <%= link_to "編集", edit_task_path(task), class: "px-4 py-2 bg-gray-100 text-sm font-medium rounded-lg hover:bg-gray-200" %>
-      <%= button_to "削除", task, method: :delete, data: { turbo_confirm: t("confirm") }, class: "px-4 py-2 bg-red-50 text-red-600 text-sm font-medium rounded-lg hover:bg-red-100" %>
+      <%= link_to "編集", edit_task_path(task), class: "btn-outline" %>
+      <%= button_to "削除", task_path(task), method: :delete, 
+          form: { data: { turbo_confirm: "本当に削除しますか？" } }, 
+          class: "btn-danger" %>
     </div>
   </div>
-  <%# メインコンテンツ %>
-  <div class="space-y-8">
-    <section>
-      <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">目的 / 価値</h4>
-      <div class="text-gray-700 bg-gray-50 p-4 rounded-lg whitespace-pre-wrap"><%= task.value.presence || "未設定" %></div>
-    </section>
-    <section>
-      <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">完了定義 (DoD)</h4>
-      <div class="text-gray-700 bg-gray-50 p-4 rounded-lg whitespace-pre-wrap"><%= task.definition_of_done.presence || "未設定" %></div>
-    </section>
-    <section>
-      <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">手順</h4>
-      <div class="text-gray-700 border border-gray-100 p-4 rounded-lg whitespace-pre-wrap shadow-inner min-h-[100px]"><%= task.procedures.presence || "手順未登録" %></div>
-    </section>
-  </div>
-  <%# メタデータエリア %>
-  <div class="mt-8 pt-8 border-t border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div>
-      <h4 class="text-[10px] font-bold text-gray-400 uppercase mb-1">優先度</h4>
-      <p class="text-sm font-bold <%= priority_group_text_class(task.priority_group) %>"><%= task.priority_group_i18n %></p>
+
+  <%# 下部：メタ情報（優先度・ポイントなど） %>
+  <div class="flex items-center justify-between pt-6 border-[var(--border-color)] text-xs text-[var(--text-default)] opacity-70">
+    <div class="flex gap-8">
+      <div>
+        <div class="detail-label">優先度</div>
+        <span class="font-bold <%= priority_group_text_class(task.priority_group) %>">
+          <%= task.priority_group_i18n %>
+        </span>
+      </div>
+      <div>
+        <div class="detail-label">ストーリーポイント</div>
+        <span class="font-bold text-blue-600"><%= task.story_point_i18n %></span>
+      </div>
     </div>
-    <div>
-      <h4 class="text-[10px] font-bold text-gray-400 uppercase mb-1">ストーリーポイント</h4>
-      <p class="text-sm font-bold text-blue-600"><%= task.story_point_i18n %></p>
-    </div>
-    <div>
-      <h4 class="text-[10px] font-bold text-gray-400 uppercase mb-1">作成日時</h4>
-      <p class="text-[11px] text-gray-500 font-mono"><%= l task.created_at, format: :long %></p>
+    <div class="text-right">
+      <div class="detail-label">作成日時</div>
+      <%= l task.created_at, format: :long %>
     </div>
   </div>
+
+  <%# 内容エリア：各セクション %>
+  <div class="grid gap-6">
+    <% [["目的 / 価値", task.value.presence], ["完了定義 (DOD)", task.definition_of_done.presence ], ["手順", task.procedures.presence]].each do |label, content| %>
+      <div class="bg-[var(--bg-white)] p-5 rounded-lg border border-[var(--border-color)] shadow-sm">
+        <div class="detail-label"><%= label %></div>
+        <div class="text-[var(--text-default)] leading-relaxed">
+          <%= content.present? ? content : "未設定" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
 </div>
