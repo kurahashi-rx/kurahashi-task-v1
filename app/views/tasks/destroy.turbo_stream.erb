@@ -1,0 +1,17 @@
+<%# リストからそのタスクを消し去る %>
+<%= turbo_stream.remove dom_id(@task) %>
+
+<%# 詳細パネルを「タスクを選択してください」という初期状態（SVG画像）に戻す %>
+<%= turbo_stream.update "task_detail" do %>
+  <div class="flex flex-col items-center justify-center h-full text-[var(--text-default)] opacity-30">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+    </svg>
+    <p class="text-lg">タスクを選択すると詳細が表示されます</p>
+  </div>
+<% end %>
+
+<%# 「削除しました」通知を表示 %>
+<%= turbo_stream.replace "flash" do %>
+  <%= render "layouts/flash" %>
+<% end %>

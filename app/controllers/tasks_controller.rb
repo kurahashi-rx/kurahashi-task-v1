@@ -1,76 +1,111 @@
 # frozen_string_literal: true
 
-# [Tasksコントローラー]
 class TasksController < ApplicationController
-  # 特定のアクションを実行する前に、共通の処理(set_task)を差し込みます
+  # --------------------------------------------------------------------------------------------------
+  # フィルタ（前処理）
+  # 特定のアクションの「前・後・周囲」に実行される処理。before_action はまさにこれの代表格です。
+  # before_action：アクションの前に実行する。データの準備（set_task）、ログインチェックなど
+  # after_action：アクションの後に実行する。ログの記録、データの分析、不要な一時ファイルの削除など
+  # around_action：アクションの前後に実行する。処理時間の計測、例外処理（エラーハンドリング）など
+  # --------------------------------------------------------------------------------------------------
+
+  # show, edit, update, destroyのアクション実行前に @task をセットする
+  # これにより各メソッド内で Task.find(params[:id]) を書く手間を省いている
   before_action :set_task, only: %i[show edit update destroy]
 
-  # GET /tasks (Springの @GetMapping)
+  # --------------------------------------------------------------------------------------------------
+  # アクション
+  # 外部（URL）からのリクエストに直接対応する「窓口」となるメソッド群。index や show などがこれに当たります。
+  # --------------------------------------------------------------------------------------------------
+
+  # 一覧表示
+  # GET /tasks
   def index
-    # 全件取得。優先度(priority_group)の昇順、その後作成日時(created_at)の降順でソート
     @tasks = Task.all.order(priority_group: :asc, created_at: :desc)
   end
 
+  # 1件の明細表示
   # GET /tasks/1
   def show
-    @task = Task.find(params[:id])
-      render layout: false if turbo_frame_request?
+    # Turbo Frameからのリクエスト（モーダル表示など）の場合、
+    # ヘッダー/フッターを含まないコンテンツのみを返すことで高速化
+    render layout: false if turbo_frame_request?
   end
 
-  # GET /tasks/new
+  # GET /tasks/new 新規作成画面を表示
   def new
     @task = Task.new
   end
 
-  # GET /tasks/1/edit
+  # GET /tasks/1/edit 編集画面を表示
   def edit
-    # 詳細画面と同様、フレーム内更新ならレイアウトをスキップ
-    render layout: false if turbo_frame_request?
-  end
-
-  # POST /tasks (Springの @PostMapping)
-  def create
-    @task = Task.new(task_params)
-      if @task.save
-        # 修正ポイント: redirect用ではなく、今すぐ出すための .now を使う
-        flash.now[:notice] = t("notice.created")
-
-        respond_to do |format|
-          format.turbo_stream # create.turbo_stream.erb を探しに行く
-          format.html { redirect_to @task }
-        end
-      else
-        # バリデーションエラー時は、HTTP 422で新規作成画面を再表示
-        render :new, status: :unprocessable_entity
-      end
-  end
-
-  # PATCH/PUT /tasks/1
-  def update
-    if @task.update(task_params)
-        respond_to do |format|
-          format.turbo_stream # update.turbo_stream.erb を探しに行く
-          format.html { redirect_to @task }
-        end
-    else
-        render :edit, status: :unprocessable_entity
+    # インプレイス編集（一覧画面内での編集）などを想定し、レイアウトをスキップ
+    if turbo_frame_request?
+      # もしこのリクエストが Turbo Frame からのものだったら
+      # レイアウト（共通のヘッダーやフッター）を表示せずに、中身だけ返す
+      render layout: false
     end
   end
 
-  # DELETE /tasks/1
-  def destroy
-    @task.destroy
-    redirect_to tasks_url, notice: t("notice.destroyed")
+  # POST /tasks 保存処理
+  def create
+    @task = Task.new(task_params)
+    if @task.save
+      # 【重要】Turbo Streamでページを切り替えずに通知を出すため flash.now を使用。通常の flash だと「次のリクエスト」までメッセージが残ってしまうため
+      flash.now[:notice] = t("notice.created")
+
+      respond_to do |format|
+        format.turbo_stream # create.turbo_stream.erb を呼び出し、一覧に1行追加する処理などを行う
+        format.html { redirect_to @task }
+      end
+    else
+      # バリデーションエラー(422 Unprocessable Entity)を返すのはTurboで必須の作法
+      render :new, status: :unprocessable_entity
+    end
   end
 
+  # PATCH/PUT /tasks/1 タスクを1つ更新
+  def update
+    if @task.update(task_params)
+      flash.now[:notice] = t("notice.updated")
+
+      respond_to do |format|
+        format.turbo_stream # update.turbo_stream.erb を呼び出し、該当する行だけを書き換える
+        format.html { redirect_to @task }
+      end
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  # DELETE /tasks/1 タスクを1つ削除
+  def destroy
+    @task.destroy
+
+    # 削除後、一覧からその要素を消去する指示を Turbo Stream で送る
+    flash.now[:notice] = t("notice.destroyed")
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to tasks_url, notice: t("notice.destroyed") }
+    end
+  end
+
+  # --------------------------------------------------------------------------------------------------
+  # プライベートメソッド
+  # --------------------------------------------------------------------------------------------------
   private
 
+  # リクエストパラメータからタスクデータを取得
   def set_task
-    # 共通処理：IDに基づいてレコードを1件取得 (find_by_id に相当)
     @task = Task.find(params[:id])
   end
 
-  # Strong Parameters：セキュリティ(マスアサインメント対策)のため
+  # --------------------------------------------------------------------------------------------------
+  # ストロングパラメータ
+  # Strong Parameters: 悪意のあるパラメータ（admin: trueなど）が送り込まれるのを防ぐ防波堤
+  # 許可した項目以外は保存・更新されないように制限している
+  # --------------------------------------------------------------------------------------------------
   def task_params
     params.require(:task).permit(
       :status,

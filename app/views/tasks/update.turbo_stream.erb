@@ -1,4 +1,8 @@
-<%# 1. 左側リストの該当タスク(ID指定)を、新しい内容で置き換える %>
+<%# 左側リストを更新 %>
 <%= turbo_stream.replace dom_id(@task), partial: "tasks/task", locals: { task: @task } %>
-<%# 2. 右側パネルの内容を詳細画面に戻す %>
+
+<%# 右側詳細パネルを更新 %>
 <%= turbo_stream.update "task_detail", partial: "tasks/show_content", locals: { task: @task } %>
+
+<%# フラッシュメッセージを表示 %>
+<%= turbo_stream.replace "flash", partial: "layouts/flash" %>
