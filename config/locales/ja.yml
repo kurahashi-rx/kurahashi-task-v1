@@ -64,6 +64,11 @@ ja:
 
   # 画面ごとの文言
   views:
+    # メニュー
+    menu:
+      task: "✅タスク一覧"
+      plan: "📝プランニング"
+      setting: "⚙️設定"
     # タスク関連画面
     tasks:
       index:

@@ -25,6 +25,25 @@ body {
 }
 
 @layer components {
+  /* ナビゲーション用のボタン共通スタイル */
+  .nav-button {
+    @apply text-sm font-medium px-3 py-2 rounded-md transition-all duration-200;
+    color: var(--text-white);
+    opacity: 0.85;
+  }
+
+  .nav-button:hover {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.1); /* ほのかに白く光る */
+  }
+
+  /* 現在表示中のページなど、強調したい場合 */
+  .nav-button-active {
+    background-color: rgba(255, 255, 255, 0.2);
+    opacity: 1;
+    font-weight: 700;
+  }
+
   /* カードデザイン */
   .card {
     background-color: var(--bg-base);
