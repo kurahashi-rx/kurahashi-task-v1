@@ -541,6 +541,12 @@ video {
 .mt-8 {
   margin-top: 2rem;
 }
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+.ml-2 {
+  margin-left: 0.5rem;
+}
 .block {
   display: block;
 }
@@ -568,6 +574,9 @@ video {
 .h-full {
   height: 100%;
 }
+.h-4 {
+  height: 1rem;
+}
 .min-h-\[100px\] {
   min-height: 100px;
 }
@@ -588,6 +597,9 @@ video {
 }
 .w-full {
   width: 100%;
+}
+.w-4 {
+  width: 1rem;
 }
 .min-w-\[280px\] {
   min-width: 280px;
@@ -685,6 +697,11 @@ video {
   --tw-space-y-reverse: 0;
   margin-bottom: calc(2rem * var(--tw-space-y-reverse));
   margin-top: calc(2rem * (1 - var(--tw-space-y-reverse)));
+}
+.space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-left: calc(0.5rem * (1 - var(--tw-space-x-reverse)));
+  margin-right: calc(0.5rem * var(--tw-space-x-reverse));
 }
 .divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
@@ -1108,6 +1125,11 @@ video {
   box-shadow:
     var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
     var(--tw-shadow);
+}
+.filter {
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast)
+    var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate)
+    var(--tw-sepia) var(--tw-drop-shadow);
 }
 .transition {
   transition-duration: 0.15s;

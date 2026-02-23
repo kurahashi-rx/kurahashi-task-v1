@@ -21,7 +21,14 @@ class TasksController < ApplicationController
   # 一覧表示
   # GET /tasks
   def index
-    @tasks = Task.all.order(priority_group: :asc, created_at: :desc)
+    # 複数ステータスによるフィルタリングをサポート
+    # params[:statuses] はチェックボックス等で送られる配列を想定
+    selected = Array(params[:statuses]).select(&:present?)
+    @selected_statuses = selected
+
+    scope = Task.all
+    scope = scope.where(status: selected) if selected.any?
+    @tasks = scope.order(priority_group: :asc, created_at: :desc)
   end
 
   # 1件の明細表示

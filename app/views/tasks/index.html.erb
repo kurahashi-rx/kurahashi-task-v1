@@ -12,14 +12,33 @@
   <div class="w-1/3 pane-divider-r bg-[var(--bg-white)] overflow-y-auto">
     
     <%#  sticky top-0: スクロールしても「タイトルと新規作成ボタン」を常に最上部に固定 %>
-    <div class="sticky top-0 z-10 bg-[var(--bg-white)] p-4 border-b border-[var(--border-color)] flex justify-between items-center">
-      <h1 class="text-xl font-bold text-[var(--text-default)] tracking-tight">
-        <%= t("views.tasks.index.title") %>
-      </h1>
-      <%# 新規作成ボタン %>
-      <%= link_to "+", new_task_path, 
-          data: { turbo_frame: "task_detail" }, 
-          class: "inline-flex items-center px-3 py-1 bg-[var(--accent-warm)] text-[var(--text-default)] rounded-md hover:brightness-110 shadow-sm" %>
+    <div class="sticky top-0 z-10 bg-[var(--bg-white)] p-4 border-b border-[var(--border-color)]">
+      <div class="flex justify-between items-center mb-3">
+        <h1 class="text-xl font-bold text-[var(--text-default)] tracking-tight">
+          <%= t("views.tasks.index.title") %>
+        </h1>
+        <%# 新規作成ボタン %>
+        <%= link_to "+", new_task_path,
+            data: { turbo_frame: "task_detail" },
+            class: "inline-flex items-center px-3 py-1 bg-[var(--accent-warm)] text-[var(--text-default)] rounded-md hover:brightness-110 shadow-sm" %>
+      </div>
+
+      <%# フィルタフォーム：ステータスを複数選択可能にする %>
+      <%= form_with url: tasks_path, method: :get, local: true, class: "mb-3" do %>
+        <div class="flex flex-wrap gap-2 items-center">
+          <% Task.statuses.keys.each do |s| %>
+            <label class="inline-flex items-center space-x-2 text-sm">
+              <%# チェックボックス %>
+              <%= check_box_tag 'statuses[]', s, (@selected_statuses || []).include?(s), class: "h-4 w-4" %>
+              <span><%= I18n.t("activerecord.enums.task.status.#{s}") %></span>
+            </label>
+          <% end %>
+          <div class="ml-2">
+            <%= submit_tag t("filter"), class: "inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md text-sm" %>
+            <%= link_to t("clear"), tasks_path, class: "inline-flex items-center px-3 py-1 ml-2 bg-gray-100 text-sm rounded-md" %>
+          </div>
+        </div>
+      <% end %>
     </div>
 
     <%# リスト区切り - divide-gray-100 を共通色へ %>

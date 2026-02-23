@@ -8,6 +8,8 @@ ja:
   "destroy": "削除"
   "show": "表示"
   "new": "新規作成"
+  "filter": "フィルター"
+  "clear": "クリア"
   "confirm": "本当に実行しますか？"
 
   # ActiveRecord (ORM) 関連の定義
