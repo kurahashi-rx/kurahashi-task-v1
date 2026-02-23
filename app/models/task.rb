@@ -3,7 +3,7 @@
 class Task < ApplicationRecord
   # --- バリデーション (Springの @NotBlank や @Size に相当) ---
   validates :status, presence: true
-  validates :title, presence: true, length: { maximum: 20 }
+  validates :title, presence: true, length: { maximum: 40 }
   validates :priority_group, presence: true
 
   # --- Enum定義 ---
