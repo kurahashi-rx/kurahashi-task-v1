@@ -21,20 +21,16 @@ class TasksController < ApplicationController
   # 一覧表示
   # GET /tasks
   def index
-    # 1. パラメータがあればそれを使用し、なければデフォルト値（done以外）を設定
+    # 1. フィルタリングの設定
     if params[:statuses].present?
-      selected = Array(params[:statuses]).select(&:present?)
+      @selected_statuses = Array(params[:statuses]).select(&:present?)
     else
       # 初期表示：done 以外のステータスをすべて選択状態にする
-      selected = Task.statuses.keys - ["done"]
+      @selected_statuses = Task.statuses.keys - ["done"]
     end
 
-    @selected_statuses = selected
-
-    # 2. フィルタリングの実行
-    scope = Task.all  
-    scope = scope.where(status: selected) if selected.any?
-    @tasks = scope.order(priority_group: :asc, created_at: :desc)
+    # 2. 検索・ソートのロジックを繋げていく (ここでは base_tasks や query など)
+    @tasks = Task.where(status: @selected_statuses).in_priority_order
 
   end
 

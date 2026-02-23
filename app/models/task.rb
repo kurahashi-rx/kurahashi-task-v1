@@ -46,4 +46,26 @@ class Task < ApplicationRecord
     # 選択されている値（例: "point_3"）を元に ja.yml から日本語を引く
     I18n.t("activerecord.enums.task.story_point.#{story_point}")
   end
+
+  # --- SQL定義 ---
+  # ステータスのカスタム順序をスコープとして定義
+  scope :order_by_custom_status, -> {
+    # 順序を配列で定義しておくと、後で順番を変えたくなった時にここだけ直せばOK
+    order_logic = <<-SQL
+      CASE status
+        WHEN 'sprint'  THEN 1
+        WHEN 'ready'   THEN 2
+        WHEN 'backlog' THEN 3
+        WHEN 'done'    THEN 4
+        ELSE 5
+      END
+    SQL
+    order(Arel.sql(order_logic))
+  }
+
+  scope :in_priority_order, -> {
+  order(:priority_group).order_by_custom_status.order(created_at: :desc)
+  }
+
+  
 end
