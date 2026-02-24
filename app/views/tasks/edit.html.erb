@@ -6,9 +6,5 @@
     <div class="bg-white rounded-lg shadow-sm px-6 py-6">
       <%= render "form", task: @task %>
     </div>
-    <div class="mt-6 flex gap-4">
-      <%= link_to t("views.tasks.edit.show"), @task, class: "text-sm text-gray-600 hover:text-gray-800" %>
-      <%= link_to t("views.tasks.edit.back"), tasks_path, class: "text-sm text-gray-600 hover:text-gray-800" %>
-    </div>
   </div>
 <% end %>
