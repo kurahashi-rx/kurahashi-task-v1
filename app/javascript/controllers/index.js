@@ -4,11 +4,11 @@
 
 import { application } from "./application"
 
-import FlashController from "./flash_controller"
+import FlashController from "./ui/flash_controller"
 application.register("flash", FlashController)
 
-import NavbarController from "./navbar_controller"
+import NavbarController from "./ui/navbar_controller"
 application.register("navbar", NavbarController)
 
-import DrawerController from "./drawer_controller"
+import DrawerController from "./ui/drawer_controller"
 application.register("drawer", DrawerController)
