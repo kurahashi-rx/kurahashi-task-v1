@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# DailyReportモデル
 class DailyReport < ApplicationRecord
   # --- バリデーション (Springの @NotBlank や @Size に相当) ---
   # presence: true は「必須入力」、length: { maximum: 20 } は「最大20文字」
@@ -19,6 +20,7 @@ class DailyReport < ApplicationRecord
 
   def available_focus_time
     return 0.0 unless work_hours && meeting_hours
+
     work_hours - meeting_hours
   end
 

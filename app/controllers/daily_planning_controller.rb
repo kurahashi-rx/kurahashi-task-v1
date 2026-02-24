@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# デイリープランニング画面コントローラー
 class DailyPlanningController < ApplicationController
   def edit
     # 今日一日のレポートを取得、なければ今日の日付で新しく作る(UPSERT準備)

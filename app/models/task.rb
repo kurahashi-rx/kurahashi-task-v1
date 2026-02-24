@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Taskモデル
 class Task < ApplicationRecord
   # --- バリデーション (Springの @NotBlank や @Size に相当) ---
   validates :status, presence: true

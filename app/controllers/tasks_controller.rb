@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# タスクメンテ画面コントローラー
 class TasksController < ApplicationController
   # --------------------------------------------------------------------------------------------------
   # フィルタ（前処理）
