@@ -1,15 +1,17 @@
 <%# タスク詳細コンテンツ %>
 <div class="max-w-4xl mx-auto space-y-6">
   <%# ヘッダーエリア：タイトルと操作ボタン %>
-  <div class="flex justify-between items-start border-b border-[var(--border-color)] pb-4">
+  <div class="flex flex-col sm:flex-row justify-between items-start border-b border-[var(--border-color)] pb-4 gap-4">
     <div>
       <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[var(--bg-soft-green)] text-[var(--bg-strong-green)] mb-2">
         <%= task.category %>
       </span>
-      <h2 class="text-3xl font-bold text-[var(--text-default)]"><%= task.title %></h2>
+      <h2 class="text-xl font-bold text-[var(--text-default)] break-words">
+        <%= task.title %>
+      </h2>
     </div>
     
-    <div class="flex gap-2">
+    <div class="flex gap-2 shrink-0">
       <%= link_to "編集", edit_task_path(task), class: "btn-outline" %>
       <%= button_to "削除", task_path(task), method: :delete, 
           form: { data: { turbo_confirm: "本当に削除しますか？" } }, 
