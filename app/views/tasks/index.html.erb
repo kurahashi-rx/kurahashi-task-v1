@@ -1,4 +1,4 @@
-<div data-controller="drawer">
+<div data-controller="ui--drawer">
 
   <%# 修正：位置を fixed (固定) にし、高さを 0 にすることで下の要素を押し下げないようにします %>
   <div id="flash" class="fixed top-0 left-0 w-full z-[9999] pointer-events-none">
@@ -26,7 +26,7 @@
         </div>
         <%# フィルタボタン（Drawer を開く） %>
         <div class="mb-3">
-          <button data-action="click->drawer#open" class="inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md text-sm">
+          <button data-action="click->ui--drawer#open" class="inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md text-sm">
             <%= t("filter") %>
           </button>
           <%= link_to t("clear"), tasks_path, class: "inline-flex items-center px-3 py-1 ml-2 bg-gray-100 text-sm rounded-md" %>
@@ -56,18 +56,18 @@
     hidden: 初期状態は非表示。
     data-action: 背景クリックでサイドバーを閉じる。
   %>
-  <div data-drawer-target="overlay" data-action="click->drawer#close" class="hidden fixed inset-0 bg-black/50 z-[100]"></div>
+  <div data-ui--drawer-target="overlay" data-action="click->ui--drawer#close" class="hidden fixed inset-0 bg-black/50 z-[100]"></div>
   <%# 
     フィルタサイドバー本体。
     fixed & h-full: 画面右端にフルサイズで固定。
     transform translate-x-full: 初期状態は画面の右外側に追い出しておく。
     transition-transform: open時に滑らかにスライドインさせる。
   %>
-  <aside data-drawer-target="container" class="fixed top-0 right-0 h-full w-80 bg-white shadow-xl z-[101] transform translate-x-full transition-transform duration-300">
+  <aside data-ui--drawer-target="container" class="fixed top-0 right-0 h-full w-80 bg-white shadow-xl z-[101] transform translate-x-full transition-transform duration-300">
     <%# サイドバー内のヘッダー %>
     <div class="flex items-center justify-between p-4 border-b">
       <h2 class="font-semibold"><%= t("filter") %></h2>
-      <button data-action="click->drawer#close" class="text-gray-500 hover:text-gray-700">&times;</button>
+      <button data-action="click->ui--drawer#close" class="text-gray-500 hover:text-gray-700">&times;</button>
     </div>
     <div class="p-4 overflow-y-auto h-full">
       <%# フィルタフォーム：GETリクエストで一覧画面（tasks_path）へ飛ばす %>
