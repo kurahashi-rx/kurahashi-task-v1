@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import Tasks__FormController from "./tasks/form_controller"
+application.register("tasks--form", Tasks__FormController)
+
 import Ui__DrawerController from "./ui/drawer_controller"
 application.register("ui--drawer", Ui__DrawerController)
 
