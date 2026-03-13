@@ -8,14 +8,14 @@ erDiagram
     User ||--o{ DailyReports : "記録"
 
     Tasks {
-        string status "enum: backlog, todo, doing, done"
+        string status "enum: backlog, ready, sprint, done"
         string category "3文字の分類コード"
         string title "名称"
         text value "達成することで提供できる価値"
         text definition_of_done "完了定義"
         text procedures "手順（マークダウン形式）"
-        string priority_group "enum: P1, P2, P3"
-        integer story_point "1, 3, 5"
+        string priority_group "enum: p1, p2, p3（内部コード。画面表示は P1/P2/P3）"
+        integer story_point "0(未設定), 1, 3, 5"
         integer sort_order "並べ替え用の数字"
         date completed_on "完了日"
     }
@@ -57,3 +57,5 @@ Railsのモデル内でメソッド（計算ロジック）として実装する
 
 - enumのオプション「 _prefix: true」は必ず設定する
     - 特にデメリットがなく、明確になるため
+- `Task` モデルでは、`priority_group` は内部的には `p1/p2/p3` の文字列を保存し、表示時に `P1/P2/P3` へ変換する。
+- `story_point` は `0` を未設定（未見積もり）として扱い、実績値としては `1/3/5` を使用する。
