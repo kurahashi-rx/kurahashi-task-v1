@@ -118,6 +118,11 @@ Lightsailの管理画面で以下のポート以外をすべて閉じます。
 - IP変動を気にせず済むよう、Lightsailブラウザコンソールを活用する
   - SSHクライアントの設定不要で、どこからでも安全に作業可能です。
 
+## 6. 現状の運用フェーズについて
+
+- 本ドキュメントに記載している構成は、**本番運用時のターゲット構成** を示すものであり、現時点ではローカル開発環境のみで動作している。
+- 実際に Lightsail / Cloudflare 構成へ移行する際は、本ファイルと `docker-compose.yml`・`config/environments/production.rb` などの設定が一致しているかを確認し、差分があればドキュメントを更新する。
+
 ## 実装メモ
 
 Railsの `config/environments/production.rb` で以下の設定を忘れずに
