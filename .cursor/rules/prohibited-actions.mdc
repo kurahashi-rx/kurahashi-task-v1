@@ -1,0 +1,9 @@
+---
+description: ツール追加や設定変更に関する禁止事項
+alwaysApply: true
+---
+
+# 禁止事項
+
+- `bundle install` や `npm install` を伴う大きなライブラリ追加は、必ず事前にユーザーの許可を取ること。
+- 既存の Tailwind CSS 設定（`tailwind.config.js` 等）を勝手に書き換えないこと。

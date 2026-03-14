@@ -1,0 +1,14 @@
+---
+description: Ruby / Rails のコーディングルール
+globs: |
+  app/models/**/*.rb
+  app/controllers/**/*.rb
+  app/helpers/**/*.rb
+alwaysApply: false
+---
+
+# Ruby / Rails コーディングルール
+
+- **Enum**: `enum` を設定する場合は、必ず `_prefix: true` を付与すること。
+- **命名規則**: 日付は `_on`、日時は `_at` を末尾につけること（例: `completed_on`, `created_at`）。
+- **計算ロジック**: `schema.md` の指示通り、集中時間やキャパシティ Pt などの計算項目は DB に保存せず、**Model 内のメソッド**として実装すること。

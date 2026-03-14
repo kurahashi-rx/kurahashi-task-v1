@@ -1,0 +1,14 @@
+---
+description: フロントエンド (Tailwind / Stimulus) のルール
+globs: |
+  app/views/**/*.html.erb
+  app/javascript/**/*.{js,ts}
+  app/assets/stylesheets/**/*.{css,scss}
+alwaysApply: false
+---
+
+# UI / フロントエンド
+
+- **CSS**: **Tailwind CLI** を使用し、`assets/builds/tailwind.css` を前提とすること。
+- **コンポーネント**: 新しい UI を作成する際は、`app/views/shared/` にある既存の共通パーツを優先的に再利用すること。
+- **JavaScript**: **Stimulus** を基本とし、`app/javascript/controllers/` にコントローラを配置すること。
