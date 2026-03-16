@@ -84,4 +84,4 @@ test:
 production:
   <<: *default
   database: app_production
-  username: app
+  username: postgres
