@@ -13,6 +13,9 @@ RUN bundle install
 # アプリケーション全ファイルのコピー
 COPY . .
 
+# 本番環境のアセットをビルド（RAILS_ENV は起動時の環境変数に依存）
+RUN bundle exec rails assets:precompile
+
 # サーバー起動スクリプトを実行可能に
 RUN chmod +x bin/server
 
