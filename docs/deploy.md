@@ -51,3 +51,23 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml exec app bundle 
 CSS/JS が更新されても反映されない場合は、Cloudflare ダッシュボードから対象ドメインを選択し、  
 `Caching > Configuration > Purge Cache` で `Purge Everything` を実行します。
 
+### Cloudflare WAF / Lightsail ファイアウォール設定メモ
+
+#### Cloudflare WAF（自分以外をブロック）
+
+- Cloudflareダッシュボード → 対象ドメイン → `Security` → `WAF` → `Custom rules` からルールを作成。
+- 例（自分のIPv4/IPv6以外をブロックする場合）:
+  - Expression: `ip.src ne { <自分のIPv4>/32 <自分のIPv6>/128 }`
+  - Action: `Block`
+- もし今後、動的IPで運用する場合は、代わりに「カスタムヘッダー必須」ルールを使う:
+  - Expression: `http.request.headers["x-private-access"] ne "自分だけが知るトークン"`
+  - Action: `Block`
+
+#### Lightsail ファイアウォール
+
+- IPv4:
+  - `HTTP (TCP 80)`: Cloudflare経由のアクセスのみを想定し、Cloudflare公開IPv4レンジからのアクセスを許可。それ以外は拒否。
+  - `SSH (TCP 22)`: インターネットからは閉じ、基本的に Lightsail ブラウザコンソールでのみ操作する。
+- IPv6:
+  - 不要なのでLightsail側の「IPv6 ネットワーキング」を無効化しておき、Cloudflare側も IPv4 のみで運用する。
+
