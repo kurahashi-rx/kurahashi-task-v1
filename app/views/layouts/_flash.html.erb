@@ -1,5 +1,5 @@
 <% flash.each do |message_type, message| %>
-  <div data-controller="ui--flash" class="absolute top-4 right-4 pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-300">
+  <div data-controller="flash" class="absolute top-4 right-4 pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-300">
     <%# <div class="bg-blue-600 text-white px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto min-w-[280px] max-w-sm"> %>
     <div class="bg-blue-600 text-white px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 min-w-[280px]">
       <%# アイコンエリア：flex-shrink-0 でテキストに押されて潰れるのを防ぐ %>

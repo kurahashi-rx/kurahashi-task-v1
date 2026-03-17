@@ -4,14 +4,14 @@
 
 import { application } from "./application"
 
-import Tasks__FormController from "./tasks/form_controller"
-application.register("tasks--form", Tasks__FormController)
+import TasksFormController from "./tasks_form_controller"
+application.register("tasks-form", TasksFormController)
 
-import Ui__DrawerController from "./ui/drawer_controller"
-application.register("ui--drawer", Ui__DrawerController)
+import DrawerController from "./drawer_controller"
+application.register("drawer", DrawerController)
 
-import Ui__FlashController from "./ui/flash_controller"
-application.register("ui--flash", Ui__FlashController)
+import FlashController from "./flash_controller"
+application.register("flash", FlashController)
 
-import Ui__NavbarController from "./ui/navbar_controller"
-application.register("ui--navbar", Ui__NavbarController)
+import NavbarController from "./navbar_controller"
+application.register("navbar", NavbarController)
