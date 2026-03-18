@@ -3,138 +3,99 @@
 ## 1. 概要
 
 * 自分専用のRoRアプリケーション。
-* **Cloudflare**をリバースプロキシ（CDN）として活用し、インフラ構成を最小化。
-  * SSL終端、DDoS対策、IP制限などのセキュリティ機能をCloudflareに委ねる
-  * サーバー側は**Docker Compose**（Puma直受け）でシンプルに構築する。
+* **Cloudflare Tunnel** を活用し、EC2インスタンスをプライベート環境に置いたまま外部公開する。
+* **費用最適化:** 常用しない時間はインスタンスを停止することで、Lightsailの固定費よりも安価な運用を目指す。
+* **セキュリティ:** インバウンドポート（80, 443, 22）をすべて閉じ、Cloudflareのエッジ経由のみのアクセスを許可する。
 
 ## 2. 構成
 
 ### 構成図
 
+
 ```mermaid
 graph LR
-    subgraph Internet
-        User((自分))
-    end
+subgraph Internet
+User((自分))
+end
 
-    subgraph Edge_Service["Cloudflare (WAF/SSL)"]
-        CF[Cloudflare Proxy]
-    end
+subgraph Cloudflare_Edge["Cloudflare Edge (Free Plan)"]
+CF[Cloudflare Proxy / Access / WAF]
+end
 
-    subgraph AWS_Lightsail["AWS Lightsail Instance"]
-        FW[Firewall: Port 80, 443]
-        subgraph Docker_Compose["Docker Compose"]
-            App[Rails Container: Puma]
-            DB[(PostgreSQL Container)]
-        end
-    end
-    
-    User -- HTTPS --> CF
-    CF -- "HTTPS (Flexible/Full)" --> FW
-    FW --> App
-    App --> DB
+subgraph AWS_VPC["AWS VPC (Private Subnet)"]
+direction TB
+subgraph AWS_EC2["EC2 (t4g.nano/micro)"]
+direction TB
+subgraph Docker_Compose
+Tunnel[cloudflared Container]
+App[Rails Container: Puma]
+DB[(PostgreSQL Container)]
+end
+end
+end
 
-    %% ノートの代わりとしての注釈
-    style Edge_Service fill:#f9f,stroke:#333,stroke-width:2px
+User -- HTTPS --> CF
+CF <== Secure Tunnel (Outbound) ==> Tunnel
+Tunnel -- HTTP --> App
+App --> DB
 
+style Cloudflare_Edge fill:#f9f,stroke:#333
+style Tunnel fill:#fff2cc,stroke:#d6b656
 ```
 
-### 選定理由
+### 構成要素
 
-| コンポーネント | 選定内容 | 備考 |
-| --- | --- | --- |
-| **Proxy / SSL** | **Cloudflare (Freeプラン)** | 証明書管理が不要。WAF（アクセス制限）もGUIで完結。 |
-| **Compute** | Lightsail (Ubuntu) | Docker Engineを動かすホスト。 |
-| **App Server** | **Puma (Rails直受け)** | Nginxを挟まないことでメモリ消費と管理対象を削減。 |
-| **Database** | PostgreSQL (Container) | コンテナ内にデータを保持。 |
+今回の構成変更で登場する各コンポーネントの役割を一覧にまとめました。
+「外側（ユーザーに近い順）」から「内側（データに近い順）」に並べています。
+
+-----
+
+## インフラ構成要素 一覧
+
+| 構成要素| 概要 |
+| --- | --- |
+| **Cloudflare Edge** | ユーザーに最も近い場所でリクエストを受け、高速な応答とキャッシュを提供します。|
+| **Cloudflare Proxy / Access / WAF** | **Proxy(Cloudflare Tunnel):** パブリックIP・Elastic IP不要。ポートを全て閉じれるためセキュア<br>**Access:** 自分だけがログイン可能とする<br>**WAF:** 攻撃的な通信をエッジで遮断。 |
+| **AWS VPC** | 仮想ネットワーク空間。<br>今回はTunnelを使うため、外部公開せず運用可能 |
+| **EC2** | AWS上のサーバー|
+| **Docker Compose**| App、DB、Tunnelといった複数のコンテナを、一つの設定ファイルでまとめて起動・管理します。|
+| **cloudflared Container** | EC2の中からCloudflareへ向けて接続を確立します。<br>これがあるおかげで、**外向きのポートを全て閉じれる。**|
+| **App Server (Rails)**| Rails（Puma）本体。<br>cloudflared Container から直接HTTPで受ける。<br>ビジネスロジックを実行し、HTMLやJSONを生成してユーザーに返す。 |
+| **PostgreSQL**| コンテナとして動作し、アプリケーションのデータを保存します。<br>データはEBS（ストレージ）に永続化します。 |
 
 ## 3. 詳細スペック
 
 | 項目 | 設定内容 | 備考 |
 | --- | --- | --- |
-| **プラットフォーム** | Amazon Lightsail | 月額 $3.5〜$5.0 程度のプラン。 |
-| **OS** | Ubuntu 22.04 LTS | Dockerのインストールが容易で情報が多い |
-| **プラン** | 1GB RAM / 2 vCPUs | **Dockerエンジンとビルド時のメモリ消費**を考慮 |
-| **Storage** | 40 GB SSD | 未使用イメージを定期削除（Prune）すれば十分な容量 |
-| **Swap領域** | **2GB設定必須** | Dockerビルド時のメモリ不足を防止。 |
-| **HTTPS化** | Cloudflare Flexible/Full SSL | サーバー側に複雑なSSL設定（Certbot等）が不要。 |
-
-| **静的ファイル** | Rails (Puma) 配信 | `RAILS_SERVE_STATIC_FILES=true` に設定。 |
+| **インスタンス型** | **t4g.nano** (0.5GB) or **t4g.micro** (1GB) | コスパ重視。ビルド時のみmicroにするか、Swapで補填。 |
+| **OS** | Ubuntu 24.04 LTS (ARM64) | 最新のLTS。Dockerビルド時に `linux/arm64` を指定。 |
+| **Storage (EBS)** | 10〜20 GB (gp3) | 停止中もこの料金（月額100〜200円程度）のみ発生。 |
+| **Elastic IP** | **不要** | Tunnelが起動時に自動でエンドポイントを確立するため、固定IPは不要。 |
+| **Swap領域** | **2GB設定必須** | `t4g.nano` を選ぶ場合は特に、ビルド時のメモリ不足防止に必須。 |
 
 ## 4. セキュリティ
 
-「自分専用」を守るための設定をCloudflareとRailsの両層で行います。
+### ネットワーク層（Security Group）
 
-### Cloudflare層（WAF設定）
+* **インバウンド:** **全拒否 (None)**
+* SSH (22) すら開ける必要はありません。
+* **アウトバウンド:** **全許可 (ALL)**
+* `cloudflared` が外部（Cloudflare）へ接続するために必要。
 
-* **アクセス制限:** Cloudflareの「WAF Custom Rules」を使用し、**自分のIPv4/IPv6アドレス以外からのアクセスをブロック**する。動的IPの場合は、代わりに「自分だけが知るカスタムヘッダー（例: `X-Private-Access`）必須」ルールを使う。
-* **Bot遮断:** 既知のクローラーや攻撃Botをエッジで遮断。
+### Cloudflare層（Zero Trust / WAF）
 
-### ネットワーク層（ファイアウォール）
+* **Cloudflare Access:** 自分だけがログインできるように、メール認証（OTP）やGitHub連携を追加可能。
+* **WAF Custom Rules:** 日本国外からのアクセス遮断など、エッジ側で防御。
 
-Lightsailの管理画面で以下の方針をとります。
+## 5. 運用（コスト削減フロー）
 
-* **IPv6:** 不要なので無効化（Cloudflare / Lightsail 双方で IPv4 に絞る）。
-* **SSH (22):** インターネットからは閉じ、**Lightsailブラウザコンソールのみ許可**とする。
-* **Port 80:** 一般公開する場合は Cloudflare 経由のみを想定し、Cloudflareの公開IPv4レンジ以外からのアクセスは拒否する（必要に応じてセキュリティグループやネットワークACLで制御）。
+### インスタンスの起動・停止
 
-### アプリケーション層（認証・認可）
-
-* **MFA(多要素認証):** Rails側で `devise-two-factor` を実装。
-* **Basic認証:** 必要に応じて `config/environments/production.rb` で設定。
-
-### 秘密情報の管理
-
-* **Docker Secrets / Env:** `docker-compose.yml` で環境変数を管理。
-* **Credentials:** Railsの `master.key` はホストOS上の環境変数、またはコンテナ外のボリュームからマウント。
-
-## 5. 運用手順
+1. **作業開始時:** AWS Console または CLI から EC2 を `Start`。
+2. **接続:** `cloudflared` が自動起動し、数分でドメイン経由でアクセス可能になる。
+3. **作業終了時:** EC2 を `Stop`。これでコンピューティング料金が停止。
 
 ### デプロイ
 
-1. ローカルで開発・テスト。
-2. GitHubへPush。
-3. サーバーへSSHログイン（ブラウザコンソール推奨）。
-4. Lightsail上で `git pull`。
-5. `docker compose up --build -d`（Pumaコンテナの更新と再起動）。
-7. `docker compose exec app bundle exec rails db:migrate`。
-
-### バックアップと復旧
-
-* **スナップショット:** Lightsailの自動スナップショット（毎日1回）。
-* **DBダンプ:** `docker compose exec db pg_dump` コマンドを使用して定期的にエクスポート。
-
-### メンテナンス
-
-* **Cloudflare管理:** 証明書の更新などはCloudflareが自動で行うため、ユーザー側の作業はゼロ。
-* **キャッシュ削除:** フロントエンド（CSS/JS）を更新した際、Cloudflareの管理画面から「Purge Cache」を実行。
-
-### 保守タスク（月1回推奨）
-
-* **クリーンアップ:** `docker system prune -f` （未使用イメージ・ボリュームの削除）。
-* **イメージ更新:** `docker compose pull` でベースイメージを最新化。
-
-### 補足：JCOM（動的IP）環境でのSSH接続のコツ
-
-- IP変動を気にせず済むよう、Lightsailブラウザコンソールを活用する
-  - SSHクライアントの設定不要で、どこからでも安全に作業可能です。
-
-## 6. 現状の運用フェーズについて
-
-- 本ドキュメントに記載している構成は、**本番運用時のターゲット構成** を示すものであり、現時点ではローカル開発環境のみで動作している。
-- 実際に Lightsail / Cloudflare 構成へ移行する際は、本ファイルと `docker-compose.yml`・`config/environments/production.rb` などの設定が一致しているかを確認し、差分があればドキュメントを更新する。
-
-## 実装メモ
-
-Railsの `config/environments/production.rb` で以下の設定を忘れずに
-
-1. **HTTPSの強制:**
-```ruby
-config.force_ssl = true
-
-```
-Cloudflareから見てHTTPSであれば、Rails側でもHTTPSとして振る舞うようにします。
-
-2. **プロキシの信頼設定:**
-Cloudflareはリバースプロキシとして動作するため、Rails側でCloudflareのIPを「信頼できるプロキシ」として登録しておくと、ログに正しいクライアントIP（自分のIP）が記録されるようになります（`rack-cloudflare` などのGemを使うと楽です）。
-
+1. `docker-compose.yml` に `cloudflared` サービスを追加し、Cloudflareから発行された `TUNNEL_TOKEN` を設定。
+2. `docker compose up -d` でアプリと共にトンネルを立ち上げる。

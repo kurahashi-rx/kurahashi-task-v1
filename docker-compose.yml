@@ -1,27 +1,33 @@
 services:
   db:
-    image: postgres:15
-    container_name: my_db
+    image: postgres:16-alpine
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password # = に修正し、値を統一
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
 
-  web:
+  app:
     build: .
-    container_name: my_rails_app
-    volumes:
-      - .:/app
-    ports:
-      - "3000:3000"
+    environment:
+      RAILS_ENV: production
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}"
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      RAILS_SERVE_STATIC_FILES: "true"
     depends_on:
       - db
+    restart: unless-stopped
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
     environment:
-      - DATABASE_PASSWORD=password # db側と一致させる
-      - RAILS_ENV=development
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+    depends_on:
+      - app
+    restart: unless-stopped
 
 volumes:
-  db_data:
+  postgres_data:

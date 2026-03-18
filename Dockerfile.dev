@@ -1,0 +1,25 @@
+FROM ruby:3.2.2-slim
+
+# 必要なパッケージのインストール（開発ツール含む）
+RUN apt-get update -qq \
+  && apt-get install -y --no-install-recommends \
+     build-essential \
+     libpq-dev \
+     curl \
+     git \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Gemfile先行コピーでbundle installをレイヤーキャッシュ
+# development/test gem を含め全てインストール
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+# ソースコードのコピー（docker-compose.dev.yml のボリュームマウントで上書きされる）
+COPY . .
+
+EXPOSE 3000
+
+# bin/server: db:prepare → tailwindcss:build → rails server -b 0.0.0.0
+CMD ["bin/server"]

@@ -1,73 +1,129 @@
-## 本番デプロイ手順（Lightsail + Cloudflare）
+## デプロイ・起動手順
 
-### 前提
+---
 
-- AWS Lightsail 上に Ubuntu 22.04 LTS インスタンスを作成済み（1GB RAM / 2 vCPUs / 40GB SSD）
-- インスタンスに Docker / docker compose v2 がインストール済み
-- Cloudflare にドメインを登録し、DNS を Lightsail のパブリックIPへ向け済み
-- アプリの Git リポジトリを `/var/www/kurahashi-task` など任意ディレクトリに clone 済み
-- ホストOS上に `.env.production` を作成し、以下のような内容を設定済み
+### ローカル開発環境
+
+#### 初回セットアップ
 
 ```bash
-RAILS_ENV=production
-RAILS_MASTER_KEY=********
-APP_DATABASE_PASSWORD=********
-RAILS_SERVE_STATIC_FILES=1
-RAILS_LOG_LEVEL=info
-APP_HOST=example.com
+# プロジェクトルートへ移動
+cd ~/projects/kurahashi-task
+
+# 環境変数ファイルを作成して値を確認・編集
+cp .env.example .env
+
+# コンテナ起動（開発用）
+docker compose -f docker-compose.dev.yml up -d
+
+# DB 作成 & マイグレーション
+docker compose -f docker-compose.dev.yml exec app bundle exec rails db:create db:migrate
 ```
 
-### 初回デプロイ
+#### 起動・停止
+
+```bash
+# プロジェクトルートへ移動
+cd ~/projects/kurahashi-task
+
+# 起動
+docker compose -f docker-compose.dev.yml up -d
+
+# ログ確認
+docker compose -f docker-compose.dev.yml logs -f app
+
+# 停止
+docker compose -f docker-compose.dev.yml down
+```
+
+ブラウザで `http://localhost:3000` にアクセスして動作確認します。
+
+---
+
+### 本番デプロイ（EC2 + Cloudflare Tunnel）
+
+#### 前提
+
+- AWS EC2（t4g.nano/micro）上に Ubuntu 24.04 LTS (ARM64) インスタンスを作成済み
+- インスタンスに Docker / docker compose v2 がインストール済み
+- Swap 2GB が設定済み（nano はビルド時のメモリ不足防止のため必須）
+- アプリの Git リポジトリを `/var/www/kurahashi-task` などに clone 済み
+- Cloudflare Zero Trust でトンネルを作成し、`TUNNEL_TOKEN` を取得済み
+
+#### 環境変数ファイルの作成
+
+```bash
+cd /var/www/kurahashi-task
+
+# テンプレートをコピーして値を埋める
+cp .env.production.example .env.production
+vi .env.production
+```
+
+`.env.production` の記載例:
+
+```
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=強固なパスワード
+POSTGRES_DB=kurahashi_task_production
+SECRET_KEY_BASE=（bundle exec rails secret で生成した値）
+TUNNEL_TOKEN=（Cloudflare Zero Trust で取得したトークン）
+```
+
+#### 初回デプロイ
 
 ```bash
 cd /var/www/kurahashi-task
 git pull
 
-# 環境変数を読み込む（シェルの設定に応じて変更）
-set -a
-source .env.production
-set +a
-
-# 本番起動（開発用 compose と本番用 compose をマージ）
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+# 本番起動
+docker compose --env-file .env.production up --build -d
 
 # DB マイグレーション
-docker compose -f docker-compose.yml -f docker-compose.prod.yml exec app bundle exec rails db:migrate
+docker compose --env-file .env.production exec app bundle exec rails db:migrate
 ```
 
-ブラウザで `https://APP_HOST` にアクセスし、Cloudflare 経由でアプリが表示されることを確認します。
+ブラウザで `https://<ドメイン>` にアクセスし、Cloudflare 経由でアプリが表示されることを確認します。
 
-### 更新デプロイ
+#### 更新デプロイ
 
 ```bash
 cd /var/www/kurahashi-task
 git pull
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
-docker compose -f docker-compose.yml -f docker-compose.prod.yml exec app bundle exec rails db:migrate
+
+docker compose --env-file .env.production up --build -d
+docker compose --env-file .env.production exec app bundle exec rails db:migrate
 ```
+
+#### 停止
+
+```bash
+docker compose --env-file .env.production down
+```
+
+---
 
 ### Cloudflare キャッシュクリア
 
-CSS/JS が更新されても反映されない場合は、Cloudflare ダッシュボードから対象ドメインを選択し、  
+CSS/JS が更新されても反映されない場合は、Cloudflare ダッシュボードから対象ドメインを選択し、
 `Caching > Configuration > Purge Cache` で `Purge Everything` を実行します。
 
-### Cloudflare WAF / Lightsail ファイアウォール設定メモ
+---
+
+### Cloudflare WAF / EC2 ファイアウォール設定メモ
 
 #### Cloudflare WAF（自分以外をブロック）
 
-- Cloudflareダッシュボード → 対象ドメイン → `Security` → `WAF` → `Custom rules` からルールを作成。
-- 例（自分のIPv4/IPv6以外をブロックする場合）:
+- Cloudflare ダッシュボード → 対象ドメイン → `Security` → `WAF` → `Custom rules` からルールを作成。
+- 例（自分の IP 以外をブロック）:
   - Expression: `ip.src ne { <自分のIPv4>/32 <自分のIPv6>/128 }`
   - Action: `Block`
-- もし今後、動的IPで運用する場合は、代わりに「カスタムヘッダー必須」ルールを使う:
+- 動的 IP で運用する場合は「カスタムヘッダー必須」ルールを使う:
   - Expression: `http.request.headers["x-private-access"] ne "自分だけが知るトークン"`
   - Action: `Block`
 
-#### Lightsail ファイアウォール
+#### EC2 セキュリティグループ
 
-- IPv4:
-  - `HTTP (TCP 80)`: Cloudflare経由のアクセスのみを想定し、Cloudflare公開IPv4レンジからのアクセスを許可。それ以外は拒否。
-  - `SSH (TCP 22)`: インターネットからは閉じ、基本的に Lightsail ブラウザコンソールでのみ操作する。
-- IPv6:
-  - 不要なのでLightsail側の「IPv6 ネットワーキング」を無効化しておき、Cloudflare側も IPv4 のみで運用する。
-
+- EC2 のインバウンドは**全ポート閉鎖**（SSH 含む）。
+- 外部アクセスは Cloudflare Tunnel 経由のみ（アウトバウンドのみ）。
+- EC2 操作が必要な場合は AWS Systems Manager Session Manager を使用する。
