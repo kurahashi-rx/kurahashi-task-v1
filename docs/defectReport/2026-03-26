@@ -1,0 +1,137 @@
+## 障害まとめ
+
+### 事象
+本番環境でStimulusコントローラー（`flash_controller` など）が404になり、JS機能が動作しなかった。
+
+---
+
+### 根本原因
+
+`app/javascript/controllers/index.js` の import文が**相対パス**になっていた。
+
+```js
+// 問題のあるコード
+import FlashController from "./flash_controller"
+```
+
+**なぜ本番だけ壊れたか：**
+
+| 環境 | 動作 |
+|------|------|
+| 開発環境 | `./flash_controller` → ファイルシステムから直接配信されるので解決できる |
+| 本番環境 | `./flash_controller` → ブラウザが `/assets/controllers/flash_controller`（拡張子なし・ハッシュなし）を要求するが、そんなファイルは存在しないので404 |
+
+本番ではアセットに**フィンガープリント**（ハッシュ値）が付くため、importmapを経由しないと正しいURLに解決できない。
+
+---
+
+### 対応
+
+**① `index.js` の修正**
+
+```js
+// 修正前（相対パス）
+import FlashController from "./flash_controller"
+
+// 修正後（importmap経由）
+import FlashController from "controllers/flash_controller"
+```
+
+**② Dockerイメージの再ビルド**
+
+`git pull` だけではコンテナ内のファイルは更新されない。`--build` オプションで再ビルドが必要。
+
+```bash
+docker compose --env-file .env.production up --build -d
+```
+
+**③ アセット再コンパイル**
+
+```bash
+bundle exec rails assets:precompile RAILS_ENV=production
+```
+
+---
+
+### 今回の調査で判明した副次的な問題
+
+| 問題 | 対応 |
+|------|------|
+| `.env.production` が `docker compose` に自動読み込みされない | `ln -s .env.production .env` でリンクを作成する（未対応） |
+| `deploy.md` の手順に `assets:precompile` が抜けている | ドキュメント更新が必要 |
+
+---
+
+### 教訓
+
+- **`docker compose restart` はコードを反映しない。** コード変更後は必ず `--build` で再ビルドする
+- **本番環境のJS問題はまずアセットパイプラインを疑う。** WAFより先にRailsログで404の発生源を確認する
+- **Importmapを使う場合、import文はすべてimportmapのキー名で書く。** 相対パス（`./`）は本番で壊れる## 障害まとめ
+
+### 事象
+本番環境でStimulusコントローラー（`flash_controller` など）が404になり、JS機能が動作しなかった。
+
+---
+
+### 根本原因
+
+`app/javascript/controllers/index.js` の import文が**相対パス**になっていた。
+
+```js
+// 問題のあるコード
+import FlashController from "./flash_controller"
+```
+
+**なぜ本番だけ壊れたか：**
+
+| 環境 | 動作 |
+|------|------|
+| 開発環境 | `./flash_controller` → ファイルシステムから直接配信されるので解決できる |
+| 本番環境 | `./flash_controller` → ブラウザが `/assets/controllers/flash_controller`（拡張子なし・ハッシュなし）を要求するが、そんなファイルは存在しないので404 |
+
+本番ではアセットに**フィンガープリント**（ハッシュ値）が付くため、importmapを経由しないと正しいURLに解決できない。
+
+---
+
+### 対応
+
+**① `index.js` の修正**
+
+```js
+// 修正前（相対パス）
+import FlashController from "./flash_controller"
+
+// 修正後（importmap経由）
+import FlashController from "controllers/flash_controller"
+```
+
+**② Dockerイメージの再ビルド**
+
+`git pull` だけではコンテナ内のファイルは更新されない。`--build` オプションで再ビルドが必要。
+
+```bash
+docker compose --env-file .env.production up --build -d
+```
+
+**③ アセット再コンパイル**
+
+```bash
+bundle exec rails assets:precompile RAILS_ENV=production
+```
+
+---
+
+### 今回の調査で判明した副次的な問題
+
+| 問題 | 対応 |
+|------|------|
+| `.env.production` が `docker compose` に自動読み込みされない | `ln -s .env.production .env` でリンクを作成する（未対応） |
+| `deploy.md` の手順に `assets:precompile` が抜けている | ドキュメント更新が必要 |
+
+---
+
+### 教訓
+
+- **`docker compose restart` はコードを反映しない。** コード変更後は必ず `--build` で再ビルドする
+- **本番環境のJS問題はまずアセットパイプラインを疑う。** WAFより先にRailsログで404の発生源を確認する
+- **Importmapを使う場合、import文はすべてimportmapのキー名で書く。** 相対パス（`./`）は本番で壊れる
