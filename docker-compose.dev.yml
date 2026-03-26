@@ -2,7 +2,7 @@ services:
   db:
     image: postgres:16-alpine
     ports:
-      - "5432:5432"  # ローカルからツールでデータ参照するため
+      - '5432:5432' # ローカルからツールでデータ参照するため
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -17,14 +17,16 @@ services:
       dockerfile: Dockerfile.dev
     environment:
       RAILS_ENV: development
-      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}"
+      DB_HOST: db
+      DATABASE_URL: 'postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}'
+      BUNDLE_PATH: /bundle
     volumes:
       # ソースコードをホストと同期（ホットリロード対応）
       - .:/app
       # gem をコンテナ内ボリュームにキャッシュ（ホストの bundle と競合防止）
-      - bundle_cache:/usr/local/bundle
+      - bundle_cache:/bundle
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - db
     stdin_open: true

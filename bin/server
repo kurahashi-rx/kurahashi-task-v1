@@ -1,6 +1,9 @@
 #!/bin/bash -e
 set -e
 
+# gemのインストール（bundle_cacheボリュームが空の場合に対応）
+bundle install
+
 # データベースの準備
 bin/rails db:prepare
 

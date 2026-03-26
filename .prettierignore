@@ -1,0 +1,5 @@
+app/assets/builds/
+vendor/
+tmp/
+log/
+*.erb
