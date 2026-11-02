@@ -1,24 +1,23 @@
-# README
+# kurahashi-task（v1・凍結中）
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## 現状
+このリポジトリは v1 として凍結した。現在は理解を深めるためにrails new から作り直すことにした。
 
-Things you may want to cover:
+## 作ったもの
+タスクのスプリント管理と、日次の振り返り（実績ポイント・勤務時間など）を記録する、自分専用のタスク管理アプリ。
+- 技術スタック：Ruby 3.2 / Rails 7.2 / postgres:16-alpine / Tailwind CSS
+- できること：タスクのCRUD、2ペイン画面表示（一覧と明細）
 
-* Ruby version
+## 作り直す理由
+AI（Claude Code など）の支援で動くものはできたが、説明できるほど理解ができていない部分もある。
+そのような状態で開発をすすめるよりは、一つずつ理解しながら作り直す方がキャッチアップとしては正しい。
+そのため、 v2 では、自分でコードを書き、AIにはコードレビューや自分の説明の妥当性チェックなどをしてもらう方針とする。
 
-* System dependencies
+## v1 の反省と v2 での方針
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+| v1 の問題                                                                  | v2 での方針                                                                                                                  |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| CI が失敗したままになっている（例 Ruby 3.2 のサポート終了に対応できていない など）                        | 最新の Ruby / Rails で始め、最初から CI が通る状態を保つ<br>バージョンアップの方針を定める（例 Dependabot の PR は週に1回確認してマージする。Ruby / Rails はサポート終了の前に上げる など） |
+| 必要か不要か判断できない設定ファイルや記述が残っている                                             | 自分で理解した設定だけを追加する                                                                                                         |
+| リグレッションテストがなく、デグレを防げない                                                  | RSpec などで、機能を足すときにテストも書く                                                                                                 |
+| 何をコミットするかの基準がなかった<br>（例 `.devcontainer`、`.cursor` など今は使っていない設定や学習メモ など） | 基準を定める（例 エディタ固有の設定はコミットしない、学習メモはブログ記事にする など）                                                                             |
